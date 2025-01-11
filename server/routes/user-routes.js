@@ -1,6 +1,8 @@
 /* Express */
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
+/* Auth */
+const authenticateToken = require('../middlewares/auth');
 /* Express Validator */
 const {body, validationResult} = require('express-validator');
 /* Util Functions */
@@ -61,7 +63,7 @@ router.post("/login",[
 })
 
 /* GET user by email or all if no email is provided. DEV */
-router.get('/getUsers', async function (req, res) {
+router.get('/getUsers', authenticateToken, async function (req, res) {
     const email = req.query.email;
 
     let user;
