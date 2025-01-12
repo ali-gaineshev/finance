@@ -7,7 +7,6 @@ const authenticateToken = require('../middlewares/auth');
 const {query, body, validationResult} = require('express-validator');
 /* Util Functions */
 const {saveEntry, deleteEntry, getEntries} = require('../services/entry-util');
-
 const {HTTP_CODE} = require("../models/enums");
 /* Middleware */
 // router.use(express.json());

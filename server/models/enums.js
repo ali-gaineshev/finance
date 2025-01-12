@@ -1,3 +1,7 @@
+/**
+ * Class representing standard HTTP status codes.
+ * These constants are used to indicate the result of an HTTP request.
+ */
 class HTTP_CODE {
     static OK = 200;
     static CREATED = 201;
