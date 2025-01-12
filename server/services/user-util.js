@@ -24,7 +24,8 @@ const verifyUser = async (inputEmail, inputPassword) => {
     }
     return {
         isMatch,
-        userName: user ? user.name : null
+        username: user.name,
+        _id: user._id,
     };
 }
 

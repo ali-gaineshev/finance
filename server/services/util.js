@@ -12,7 +12,7 @@ const verifyPassword = async (inputPassword, hashedPassword) => {
 }
 
 function generateAccessToken(payload) {
-    return jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: '20m' });
+    return jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: '1h' });
 }
 
 module.exports = {

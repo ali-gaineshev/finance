@@ -12,10 +12,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 /* Routes */
 const userRoutes = require('./server/routes/user-routes');
+const entryRoutes = require('./server/routes/entry-routes');
 
-
-app.use("/userApi", userRoutes);
-
+app.use("/user_api", userRoutes);
+app.use("/entry_api", entryRoutes);
 
 app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);
