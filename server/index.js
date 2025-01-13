@@ -1,18 +1,18 @@
 /* Config */
-require('dotenv').config();
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 /* Express */
 const express = require('express');
 const app = express();
 const port = process.env.PORT;
 /* DB */
-const connectDb = require('./server/services/db-connection.js')
+const connectDb = require('./src/services/db-connection.js')
 connectDb();
 /* Middleware to parse JSON and URL-encoded data */
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 /* Routes */
-const userRoutes = require('./server/routes/user-routes');
-const entryRoutes = require('./server/routes/entry-routes');
+const userRoutes = require('./src/routes/user-routes');
+const entryRoutes = require('./src/routes/entry-routes');
 
 app.use("/user_api", userRoutes);
 app.use("/entry_api", entryRoutes);
