@@ -21,14 +21,24 @@ const saveEntry = (category, occurrence, type, date, userId) => {
 }
 
 /**
- * Retrieve all entries for a specific user from the database.
+ * Retrieve paginated entries for a specific user from the database.
  *
  * @param {string} userId - The ID of the user whose entries need to be fetched.
- * @returns {Promise} - A promise that resolves to an array of entry documents for the given user.
+ * @param {number} page - The page number to retrieve.
+ * @param {number} limit - The number of entries per page.
+ * @returns {Promise<Object>} - A promise that resolves to an object containing:
+ *    - entries: An array of entry documents for the given user.
+ *    - totalEntries: The total number of entries for the user.
  */
-const getEntries = (userId) => {
-    return Entry.find({userId: userId});
-}
+const getEntries = async (userId, page, limit) => {
+    const totalEntries = await Entry.countDocuments({ userId });
+    const entries = await Entry.find({ userId: userId })
+        .sort({ date: -1 }) // Sort by date descending (newest first)
+        .skip((page - 1) * limit) // Skip entries for previous pages
+        .limit(limit); // Fixed limit for entries per page
+
+    return { entries, totalEntries };
+};
 
 /**
  * Delete an entry by its ID.

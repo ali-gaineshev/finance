@@ -25,28 +25,35 @@ router.get('/add_entry', authenticateToken, [
             .json({errors: errors.array()});
     }
     // Add a new entry
-    try{
+    try {
         const {category, occurrence, type, date} = req.query;
         const user = req.user;
         const entry = await saveEntry(category, occurrence, type, date, user._id);
         res.status(HTTP_CODE.OK).send(entry._id);
-    }catch(err){
+    } catch (err) {
         res.status(HTTP_CODE.INTERNAL_SERVER_ERROR).send({error: err.message});
     }
 })
 
 router.get("/get_all_entries", authenticateToken, async (req, res) => {
-    // Check for validation errors
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(HTTP_CODE.BAD_REQUEST)
-            .json({errors: errors.array()});
-    }
-    try{
-        const user_id = req.user._id // from token
-        const entries = await getEntries(user_id);
-        res.status(HTTP_CODE.OK).send(entries);
-    }catch(err){
+    try {
+        // add pagination
+        const limit_per_page = 15; //hard coded value
+        const page = parseInt(req.query.page) || 1;
+        // get user's id to associate it with entries
+        const user_id = req.user._id // from jwt token
+        // fetch entries
+        const { entries, totalEntries } = await getEntries(user_id, page, limit_per_page);
+
+        res.status(HTTP_CODE.OK).send({
+            entries,
+            metadata: {
+                totalEntries,
+                currentPage: page,
+                totalPages: Math.ceil(totalEntries / limit_per_page),
+            },
+        });
+    } catch (err) {
         res.status(HTTP_CODE.INTERNAL_SERVER_ERROR).send({error: err.message})
     }
 })
