@@ -86,7 +86,7 @@ router.post("/login", [
 })
 
 router.post("/logout", (req, res) => {
-    res.clearCookie('refreshToken', { httpOnly: true, sameSite: 'strict' });
+    res.clearCookie('refreshToken', { httpOnly: true, sameSite: 'strict', secure: process.env.NODE_ENV === 'PROD'});
     res.status(HTTP_CODE.OK).json({ message: 'Logged out successfully' });
 });
 
