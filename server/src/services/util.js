@@ -29,14 +29,25 @@ const verifyPassword = (inputPassword, hashedPassword) => {
  * Generates a JWT access token.
  *
  * @param {Object} payload - The data to encode in the token
- * @returns {string} The signed JWT token that expires in 1 hour
+ * @returns {string} The signed JWT token that expires in 20 min
  */
 function generateAccessToken(payload) {
-    return jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: '1h' });
+    return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '20m' });
+}
+
+/**
+ * Generates a JWT refresh token.
+ *
+ * @param {Object} payload - The data to encode in the token
+ * @returns {string} The signed JWT token that expires in 7 days
+ */
+function generateRefreshToken(payload) {
+    return jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
 }
 
 module.exports = {
     generateAccessToken,
+    generateRefreshToken,
     hashPassword,
     verifyPassword,
 };
