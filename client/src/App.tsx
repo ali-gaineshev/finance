@@ -8,7 +8,7 @@ import AddEntryPage from './pages/AddEntryPage';
 
 function App() {
   //const { isAuthenticated } = useAuth();
-  const isAuthenticated =  true;
+  const isAuthenticated =  false;
   return (
       <BrowserRouter>
         <Routes>

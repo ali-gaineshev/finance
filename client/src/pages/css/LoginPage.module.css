@@ -1,0 +1,13 @@
+#title{
+    text-align: center;
+    margin-top: 50px;
+    margin-bottom: 100px;
+}
+.h-custom {
+    height: 100%;
+}
+@media (max-width: 450px) {
+    .h-custom {
+        height: 100%;
+    }
+}
