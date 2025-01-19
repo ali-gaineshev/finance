@@ -5,6 +5,7 @@ import styles from './LoginPage.module.css';
 import BootstrapButton from "../../components/Button.tsx"
 import BootstrapInput from "../../components/Input.tsx";
 import { FaEnvelope, FaLock } from "../../components/Fa-Icon.tsx";
+import { validateForm } from "../../utils/helpers.ts";
 
 const LoginPage: React.FC = () => {
 
@@ -20,27 +21,6 @@ const LoginPage: React.FC = () => {
         password: "",
     });
 
-    function validateForm() {
-        const { email, password } = formInput;
-        const newErrors = { email: "", password: "" };
-
-        // Email validation
-        if (!email) {
-            newErrors.email = "Email is required.";
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            newErrors.email = "Invalid email format.";
-        }
-
-        // Password validation
-        if (!password.trim()) {
-            newErrors.password = "Password is required.";
-        } else if (password.length < 6) {
-            newErrors.password = "Password must be at least 6 characters.";
-        }
-
-        setErrors(newErrors);
-        return !newErrors.email && !newErrors.password;
-    };
 
     function inputChangeHandler(event: any) {
         setFormInput(prevFormState => ({
@@ -53,7 +33,13 @@ const LoginPage: React.FC = () => {
         event.preventDefault();
 
         const { email, password, rememberme } = formInput;
+        const newErrors = validateForm(email , password)
+        console.log(newErrors)
+        if (newErrors.email !== "" && newErrors.password !== "") {
+            setInputError(newErrors)
 
+            return;
+        }
         console.log("Submitted:", { email, password, rememberme });
 
     };
@@ -79,6 +65,9 @@ const LoginPage: React.FC = () => {
                                 />
                                 <FaEnvelope />
                                 <label className="form-label" htmlFor="email_input_id">Email address</label>
+                                {inputError.email && inputError.email !== "" && (
+                                    <div className="invalid-feedback">{inputError.email}</div>
+                                )}
                             </div>
 
                             {/* Password input */}
@@ -92,6 +81,9 @@ const LoginPage: React.FC = () => {
                                 />
                                 <FaLock />
                                 <label className="form-label" htmlFor="password_input_id">Password</label>
+                                {inputError.password && inputError.password !== "" && (
+                                    <div className="invalid-feedback">{inputError.password}</div>
+                                )}
                             </div>
 
                             <div className="d-flex justify-content-between align-items-center">
