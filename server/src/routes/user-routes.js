@@ -50,14 +50,14 @@ router.post("/login", [
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(HTTP_CODE.BAD_REQUEST)
-            .json({errors: errors.array()});
+            .json({message: errors.array()});
     }
 
     //try to verify login
     const {email, password} = req.body;
     const {isMatch, username, _id} = await verifyUser(email, password);
     if (!isMatch) {
-        res.status(HTTP_CODE.BAD_REQUEST)
+        return res.status(HTTP_CODE.BAD_REQUEST)
             .json({message: 'User login failed'});
     }
 
@@ -73,16 +73,13 @@ router.post("/login", [
     const jwtAccessToken = generateAccessToken(payload);
     const jwtRefreshToken = generateRefreshToken(payload);
 
-    // Sets refresh token in HTTP-only cookie
-    res.cookie('refreshToken', jwtRefreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'PROD', // https only in prod
-        sameSite: 'strict',
-    });
-
-    res.status(HTTP_CODE.OK)
-        .json({message: 'User login success', token: jwtAccessToken});
-
+    return res.status(HTTP_CODE.OK)
+        .json({
+            message: 'User login success',
+            token: jwtAccessToken,
+            refresh: jwtRefreshToken,
+            userState: { name: username, uuid: _id }
+        });
 })
 
 router.post("/logout", (req, res) => {
@@ -91,6 +88,7 @@ router.post("/logout", (req, res) => {
 });
 
 router.post('/refresh_token', (req, res) => {
+    console.log("REFRESHING")
     //check if refresh token exists
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
