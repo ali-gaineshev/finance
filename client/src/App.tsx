@@ -1,37 +1,53 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import WelcomePage from './pages/WelcomePage';
-import LoginPage from './pages/Login/LoginPage.tsx';
+import LoginPage from './pages/Login/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import HomePage from './pages/HomePage';
 import AddEntryPage from './pages/AddEntryPage';
-// import { isAuthenticated } from './context/AuthContext';
+
+import { RequireAuth, RequireNonAuth} from './hooks/RequireAuth.tsx';
 
 function App() {
-  //const { isAuthenticated } = useAuth();
-  const isAuthenticated =  false;
-  return (
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<WelcomePage />} />
-          <Route
-              path="/login"
-              element={isAuthenticated ? <Navigate to="/home" /> : <LoginPage />}
-          />
-          <Route
-              path="/register"
-              element={isAuthenticated ? <Navigate to="/home" /> : <RegisterPage />}
-          />
-          <Route
-              path="/home"
-              element={isAuthenticated ? <HomePage /> : <Navigate to="/login" />}
-          />
-          <Route
-              path="/add_entry"
-              element={isAuthenticated ? <AddEntryPage /> : <Navigate to="/login" />}
-          />
-        </Routes>
-      </BrowserRouter>
-  );
+
+    return (
+        <BrowserRouter>
+            <Routes>
+                {/* Public Routes */}
+                <Route path="/" element={<WelcomePage />} />
+                <Route path="/register" element={
+                    <RequireNonAuth fallbackPath={"/"}>
+                        <RegisterPage />
+                    </RequireNonAuth>
+                } />
+                <Route
+                    path="/login"
+                    element={
+                        <RequireNonAuth fallbackPath={"/"}>
+                            <LoginPage />
+                        </RequireNonAuth>
+                    }
+                />
+
+                {/* Protected Routes */}
+                <Route
+                    path="/home"
+                    element={
+                        <RequireAuth fallbackPath="/login">
+                            <HomePage />
+                        </RequireAuth>
+                    }
+                />
+                <Route
+                    path="/add_entry"
+                    element={
+                        <RequireAuth fallbackPath="/login">
+                            <AddEntryPage />
+                        </RequireAuth>
+                    }
+                />
+            </Routes>
+        </BrowserRouter>
+    );
 }
 
-export default App
+export default App;

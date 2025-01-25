@@ -11,7 +11,7 @@ export const validateForm = (email: string, password: string, name? : string) =>
     // Email validation
     if (!email.trim()) {
         newErrors.email = "Email is required.";
-    } else if (validateEmail(email)) {
+    } else if (!validateEmail(email)) {
         newErrors.email = "Invalid email format.";
     }
 

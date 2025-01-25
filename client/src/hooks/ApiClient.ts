@@ -1,13 +1,13 @@
-import axios, { AxiosInstance } from 'axios';
+import axios, {AxiosInstance} from 'axios';
 import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 
-const backend_api = import.meta.env.REACT_APP_BACKEND_API;
 
-export const useApiClient = () => {
+const backend_api = import.meta.env.VITE_BACKEND_SERVER_URL;
+
+export const useAuthApiClient = (): AxiosInstance => {
     const authHeader = useAuthHeader(); // Hook to get the token
 
-    // Authenticated Axios instance
-    const authClient: AxiosInstance = axios.create({
+    return axios.create({
         baseURL: backend_api,
         timeout: 10000,
         headers: {
@@ -15,15 +15,14 @@ export const useApiClient = () => {
             'Content-Type': 'application/json',
         },
     });
+};
 
-    // Public Axios instance
-    const publicClient: AxiosInstance = axios.create({
+export const usePublicApiClient = (): AxiosInstance => {
+    return axios.create({
         baseURL: backend_api,
         timeout: 10000,
         headers: {
             'Content-Type': 'application/json',
         },
     });
-
-    return { authClient, publicClient };
 };
