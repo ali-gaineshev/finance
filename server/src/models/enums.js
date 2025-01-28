@@ -13,6 +13,11 @@ class HTTP_CODE {
     static INTERNAL_SERVER_ERROR = 500;
 }
 
+class JWT_TOKEN_CREDENTIALS_TYPE{
+    static LOGIN = "login_credentials";
+    static REFRESH = "refresh_credentials";
+}
+
 class Category {
     static food_and_drinks = "Food & Drinks";
     static transportation  = "Transportation";
@@ -38,4 +43,4 @@ class Type {
     static mixed         = "Mixed";
 }
 
-module.exports = {HTTP_CODE, Category, Occurrence, Type};
+module.exports = {HTTP_CODE, JWT_TOKEN_CREDENTIALS_TYPE, Category, Occurrence, Type};
