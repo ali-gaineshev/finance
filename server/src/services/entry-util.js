@@ -1,5 +1,5 @@
 const Entry = require('../models/entry');
-const {Category, Occurrence, Type} = require('../models/enums');
+
 
 /**
  * Save a new entry to the database.

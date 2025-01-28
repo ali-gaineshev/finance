@@ -32,7 +32,7 @@ const verifyPassword = (inputPassword, hashedPassword) => {
  * @returns {string} The signed JWT token that expires in 20 min
  */
 function generateAccessToken(payload) {
-    return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '20m' });
+    return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRY });
 }
 
 /**
@@ -42,7 +42,12 @@ function generateAccessToken(payload) {
  * @returns {string} The signed JWT token that expires in 7 days
  */
 function generateRefreshToken(payload) {
-    return jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
+    return jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: process.env.REFRESH_TOKEN_EXPIRY });
+}
+
+function generateValidationErrorResponse(errors){
+    const err = errors.array()[0];
+    return {"error": {"message": err.msg, "value": err.path }}
 }
 
 module.exports = {
@@ -50,4 +55,5 @@ module.exports = {
     generateRefreshToken,
     hashPassword,
     verifyPassword,
+    generateValidationErrorResponse
 };

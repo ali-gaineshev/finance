@@ -36,6 +36,7 @@ router.get('/add_entry', authenticateToken, [
 })
 
 router.get("/get_all_entries", authenticateToken, async (req, res) => {
+    console.log(req.cookies)
     try {
         // add pagination
         const limit_per_page = 15; //hard coded value
