@@ -1,11 +1,11 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import WelcomePage from './pages/WelcomePage';
 import LoginPage from './pages/Login/LoginPage';
-import RegisterPage from './pages/RegisterPage';
+import RegisterPage from './pages/Register/RegisterPage.tsx';
 import HomePage from './pages/HomePage';
 import AddEntryPage from './pages/AddEntryPage';
 
-import { RequireAuth, RequireNonAuth} from './hooks/RequireAuth.tsx';
+import { RequireAuth, RequireNonAuth } from './hooks/RequireAuth.tsx';
 
 function App() {
 

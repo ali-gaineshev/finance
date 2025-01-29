@@ -1,15 +1,22 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {faEnvelope, faLock} from '@fortawesome/free-solid-svg-icons';
+import {faEnvelope, faKey, faLock, faUser} from '@fortawesome/free-solid-svg-icons';
 
-const FaEnvelope = () => {
-    return (
-        <FontAwesomeIcon icon={faEnvelope} className={``}/>
-    );
+type FaUserProps = {
+    className?: string;
 };
 
-const FaLock = () => {
-    return (
-        <FontAwesomeIcon icon={faLock} />
-    )
+export const FaEnvelope: React.FC<FaUserProps> = ({ className = "" }) => {
+    return <FontAwesomeIcon icon={faEnvelope} className={className} />;
+};
+
+export const FaLock: React.FC<FaUserProps> = ({ className = "" }) => {
+    return <FontAwesomeIcon icon={faLock} className={className} />;
 }
-export { FaEnvelope, FaLock };
+
+export const FaUser: React.FC<FaUserProps> = ({ className = "" }) => {
+    return <FontAwesomeIcon icon={faUser} className={className} />;
+}
+
+export const FaKey: React.FC<FaUserProps> = ({ className = "" }) => {
+    return <FontAwesomeIcon icon={faKey} className={className} />;
+}

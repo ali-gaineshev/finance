@@ -9,13 +9,13 @@ interface BootstrapInputProps extends React.InputHTMLAttributes<HTMLInputElement
 }
 
 const BootstrapInput: React.FC<BootstrapInputProps> = ({
-                                                           id,
-                                                           type,
-                                                           className = '',
-                                                           placeholder = '',
-                                                           onChange = () => {},
-                                                           ...props
-                                                       }) => {
+       id,
+       type,
+       className = '',
+       placeholder = '',
+       onChange = () => {},
+       ...props
+   }) => {
     return (
         <input
             id={id}

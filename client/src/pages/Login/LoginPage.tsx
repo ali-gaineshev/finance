@@ -1,19 +1,29 @@
+// react
 import React, { useState } from "react";
 import {Link, useNavigate} from "react-router-dom";
+// helper funcitons
+import { validateForm } from "../../utils/helpers.ts";
+// hooks
+import { globalApiClient } from "../../hooks/ApiClient.ts";
+import useSignIn from 'react-auth-kit/hooks/useSignIn';
+// enums
+import HttpStatusCode from "../../interfaces/HttpStatusCode.ts";
+// images
 import money_stack_image from "../../assets/money_stack.png";
+//styles
 import styles from "./LoginPage.module.css";
+//components
 import BootstrapButton from "../../components/Button.tsx";
 import BootstrapInput from "../../components/Input.tsx";
 import { FaEnvelope, FaLock } from "../../components/Fa-Icon.tsx";
-import { validateForm } from "../../utils/helpers.ts";
-import {usePublicApiClient} from "../../hooks/ApiClient.ts";
-import useSignIn from 'react-auth-kit/hooks/useSignIn';
-import Htpp_code from "../../utils/HttpStatusCode.ts";
+// alert
+import alert from '../../components/ui/Alert.tsx';
+import {ToastContainer} from "react-toastify";
 
 
-const apiClient = usePublicApiClient();
 
 const LoginPage: React.FC = () => {
+    const apiClient = globalApiClient;
     const signIn = useSignIn();
     const navigate = useNavigate();
 
@@ -58,7 +68,7 @@ const LoginPage: React.FC = () => {
 
         apiClient.post('/user_api/login', { email, password })
             .then((res) => {
-                if (res.status === Htpp_code.BAD_REQUEST) {
+                if (res.status === HttpStatusCode.BAD_REQUEST) {
 
                     setInputError({
                         email: res.data.message,
@@ -67,25 +77,27 @@ const LoginPage: React.FC = () => {
                     return;
                 }
 
-                if(res.status === Htpp_code.OK) {
-                    console.log(res);
-                    console.log(res.headers);
-                    console.log(res.data)
+                if(res.status === HttpStatusCode.OK) {
                     // valid
-                    if( signIn({
-                        auth: {
-                            token: res.data.token, // access token
-                            type: 'Bearer'
-                        },
-                        refresh: res.data.refresh,  // refresh token
-                        userState: res.data.userState, // user information
-                    })){
-                        navigate('/home');
-                    }
+                    alert(res.data.message, "success");
+                    setTimeout(() => {
+                        if (
+                            signIn({
+                                auth: {
+                                    token: res.data.token, // access token
+                                    type: 'Bearer',
+                                },
+                                userState: res.data.userState, // user information
+                            })
+                        ) {
+                            navigate('/home');
+                        }
+                    }, 1000); // Delay navigation by 1 seconds
                 }
             }).catch((error) => {
 
             console.error("Login error:", error);
+            alert(error.response.data.message, "error");
         });
     };
 
@@ -188,6 +200,18 @@ const LoginPage: React.FC = () => {
                     </div>
                 </div>
             </div>
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
         </section>
     );
 };

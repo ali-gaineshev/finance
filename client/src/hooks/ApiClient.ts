@@ -1,28 +1,40 @@
-import axios, {AxiosInstance} from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
+const backendApiUrl = '/api';
 
+interface ApiClientConfig {
+    baseURL: string;
+    timeout: number;
+    headers: Record<string, string>; // Allow arbitrary string keys for headers
+    withCredentials: boolean;
+}
 
-const backend_api = import.meta.env.VITE_BACKEND_SERVER_URL;
-
-export const useAuthApiClient = (): AxiosInstance => {
-    const authHeader = useAuthHeader(); // Hook to get the token
-
-    return axios.create({
-        baseURL: backend_api,
-        timeout: 10000,
-        headers: {
-            Authorization: `Bearer ${authHeader}`,
-            'Content-Type': 'application/json',
-        },
-    });
+const apiClientConfig: ApiClientConfig = {
+    baseURL: backendApiUrl,
+    timeout: 10000,
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    withCredentials: false,
 };
 
-export const usePublicApiClient = (): AxiosInstance => {
-    return axios.create({
-        baseURL: backend_api,
-        timeout: 10000,
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    });
+export const globalApiClient = axios.create(apiClientConfig);
+
+export const useApiClient = ({ useAuth = false, withCredentials = false }: { useAuth?: boolean; withCredentials?: boolean }): AxiosInstance => {
+    const authHeader = useAuthHeader();
+
+    const customConfig: ApiClientConfig = { ...apiClientConfig, headers: { ...apiClientConfig.headers } };
+
+    if (useAuth && authHeader) {
+        customConfig.headers['Authorization'] = authHeader.trim();
+    }
+
+    if (withCredentials) {
+        customConfig.withCredentials = withCredentials;
+    }
+
+    const apiClient = axios.create(customConfig);
+
+
+    return apiClient;
 };
