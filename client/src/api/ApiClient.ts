@@ -1,5 +1,4 @@
 import axios, { AxiosInstance } from 'axios';
-import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 const backendApiUrl = '/api';
 
 interface ApiClientConfig {
@@ -21,7 +20,7 @@ const apiClientConfig: ApiClientConfig = {
 export const globalApiClient = axios.create(apiClientConfig);
 
 export const useApiClient = ({ useAuth = false, withCredentials = false }: { useAuth?: boolean; withCredentials?: boolean }): AxiosInstance => {
-    const authHeader = useAuthHeader();
+    const authHeader: string = "";
 
     const customConfig: ApiClientConfig = { ...apiClientConfig, headers: { ...apiClientConfig.headers } };
 
