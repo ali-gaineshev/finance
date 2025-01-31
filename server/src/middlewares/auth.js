@@ -26,7 +26,7 @@ const authenticateToken = (req, res, next) => {
         req.user = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);  // Attach user data to the request object
         next();  // Proceed to the original func
     } catch (err) {
-        return res.status(HTTP_CODE.UNAUTHORIZED).json({ message: 'Invalid or expired token', error: err });
+        return res.status(HTTP_CODE.FORBIDDEN).json({ message: 'Invalid or expired token', error: err });
     }
 };
 

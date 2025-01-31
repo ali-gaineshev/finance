@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Navigate } from 'react-router';
+import {isAuthenticated} from "./useAuth.tsx";
 
 
 interface RequireAuthProps {
@@ -8,8 +9,7 @@ interface RequireAuthProps {
 }
 
 export const RequireAuth: React.FC<RequireAuthProps> = ({ children, fallbackPath }) => {
-    // const isAuthenticated = useIsAuthenticated();
-    const isAuthenticated = true;
+    const isAuthenticated = isAuthenticated();
     if (!isAuthenticated) {
         // Redirect them to the /login page, but save the current location they
         // were trying to go to when they were redirected. This allows us to
