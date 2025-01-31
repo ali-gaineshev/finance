@@ -2,10 +2,10 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import WelcomePage from './pages/WelcomePage';
 import LoginPage from './pages/Login/LoginPage';
 import RegisterPage from './pages/Register/RegisterPage.tsx';
-import HomePage from './pages/HomePage';
+import HomePage from './pages/Home/HomePage.tsx';
 import AddEntryPage from './pages/AddEntryPage';
 
-import { RequireAuth, RequireNonAuth } from './hooks/RequireAuth.tsx';
+import { RequireAuth, RequireNonAuth } from './pages/RequireAuth.tsx';
 
 function App() {
 
@@ -45,6 +45,10 @@ function App() {
                         </RequireAuth>
                     }
                 />
+
+                {/*Unknown*/}
+                <Route path='*' element = {<WelcomePage />}/>
+
             </Routes>
         </BrowserRouter>
     );
