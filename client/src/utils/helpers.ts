@@ -1,4 +1,5 @@
 import * as EmailValidator from 'email-validator';
+import {ApiClientConfig, CreateApiClientConfig} from "../interfaces/ApiClientConfig.ts";
 
 export const validateEmail = (email: string) => {
     return EmailValidator.validate(email);
@@ -30,6 +31,24 @@ export const validateForm = (email: string, password: string, name? : string) =>
 
 
     return newErrors;
+}
 
 
+export const createApiClientConfig = ({url, sendCookies, accessToken}: CreateApiClientConfig) => {
+    let headers: Record<string, string | boolean> = {
+        'Content-Type': 'application/json',
+    };
+
+    if(accessToken){
+        headers = {...headers, 'Authorization' : `Bearer ${accessToken}`};
+    }
+
+    const apiClientConfig: ApiClientConfig = {
+        baseURL: url,
+        timeout: 10000,
+        headers: headers,
+        withCredentials: sendCookies,
+    };
+
+    return apiClientConfig;
 }
