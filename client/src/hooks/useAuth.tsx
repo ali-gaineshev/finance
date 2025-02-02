@@ -7,11 +7,11 @@ export const useAuth = () => {
 
 export const useIsAuthenticated = () => {
     const { auth } = useContext(AuthContext);
-    console.log(auth)
-    if (!auth) {
-        return false;
-    }
+    console.log(`useIsAuthenticated: ${!!auth?.token}`);
+    console.log(auth);
+    console.log('--------------')
 
-    return auth.token && auth.userState;
+    return !!auth?.token;
+
 }
 
