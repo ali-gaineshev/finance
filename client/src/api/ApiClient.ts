@@ -1,39 +1,33 @@
-import axios, { AxiosInstance } from 'axios';
-const backendApiUrl = '/api';
+import axios, {AxiosInstance} from 'axios';
 
-interface ApiClientConfig {
-    baseURL: string;
-    timeout: number;
-    headers: Record<string, string>; // Allow arbitrary string keys for headers
-    withCredentials: boolean;
-}
+import ServerUrl from "../interfaces/ServerUrl.ts";
+import {createApiClientConfig} from "../utils/helpers.ts";
 
-const apiClientConfig: ApiClientConfig = {
-    baseURL: backendApiUrl,
-    timeout: 10000,
-    headers: {
-        'Content-Type': 'application/json',
-    },
-    withCredentials: false,
-};
+const backendApiUrl = ServerUrl.API_PROXY;
 
-export const globalApiClient = axios.create(apiClientConfig);
+const simpleApiConfig = createApiClientConfig({url: backendApiUrl, sendCookies: false});
+export const globalApiClient: AxiosInstance = axios.create(simpleApiConfig);
 
-export const useApiClient = ({ useAuth = false, withCredentials = false }: { useAuth?: boolean; withCredentials?: boolean }): AxiosInstance => {
-    const authHeader: string = "";
-
-    const customConfig: ApiClientConfig = { ...apiClientConfig, headers: { ...apiClientConfig.headers } };
-
-    if (useAuth && authHeader) {
-        customConfig.headers['Authorization'] = authHeader.trim();
-    }
-
-    if (withCredentials) {
-        customConfig.withCredentials = withCredentials;
-    }
-
-    const apiClient = axios.create(customConfig);
+// the difference between 2 is that private one has an interceptor with attaching the token
+const apiConfigWithCredentials = createApiClientConfig({url: backendApiUrl, sendCookies: false});
+export const privateApiClient: AxiosInstance = axios.create(apiConfigWithCredentials);
 
 
-    return apiClient;
-};
+// export const useApiClient = ({ useAuth = false, withCredentials = false }: { useAuth?: boolean; withCredentials?: boolean }): AxiosInstance => {
+//     const authHeader: string = "";
+//
+//     const customConfig: ApiClientConfig = { ...apiClientConfig, headers: { ...apiClientConfig.headers } };
+//
+//     if (useAuth && authHeader) {
+//         customConfig.headers['Authorization'] = authHeader.trim();
+//     }
+//
+//     if (withCredentials) {
+//         customConfig.withCredentials = withCredentials;
+//     }
+//
+//     const apiClient = axios.create(customConfig);
+//
+//
+//     return apiClient;
+// };
