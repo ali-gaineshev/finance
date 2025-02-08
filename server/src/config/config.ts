@@ -6,6 +6,7 @@ interface Config {
     REFRESH_TOKEN_SECRET: string;
     REFRESH_TOKEN_EXPIRY: string;
     REFRESH_TOKEN_EXPIRY_SECONDS: number;
+    SALT_ROUNDS: number;
     CLIENT_URL: string;
     DB_URL: string;
 }
@@ -17,10 +18,11 @@ export default {
 
     // Tokens
     ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET || "",
-    ACCESS_TOKEN_EXPIRY: process.env.ACCESS_TOKEN_EXPIRY || "",
+    ACCESS_TOKEN_EXPIRY: process.env.ACCESS_TOKEN_EXPIRY || "1h",
     REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET || "",
-    REFRESH_TOKEN_EXPIRY: process.env.REFRESH_TOKEN_EXPIRY || "",
-    REFRESH_TOKEN_EXPIRY_SECONDS: parseInt(process.env.REFRESH_TOKEN_EXPIRY_SECONDS || "604800", 10), // Default to 7 days in seconds
+    REFRESH_TOKEN_EXPIRY: process.env.REFRESH_TOKEN_EXPIRY || "7d",
+    REFRESH_TOKEN_EXPIRY_SECONDS: parseInt(process.env.REFRESH_TOKEN_EXPIRY_SECONDS || "604800", 10), // 7 days
+    SALT_ROUNDS: parseInt(process.env.SALT_ROUNDS || "10", 10),
 
     // URLs
     CLIENT_URL: process.env.CLIENT_URL || "",
