@@ -6,11 +6,11 @@ import express, { Express, Request, Response } from "express";
 const app: Express = express();
 import Config from './config/config' ;
 /* DB */
-const connectDb = require('./services/db-connection.js')
-connectDb();
+import { connectDB } from './services/db-connection.js';
+connectDB();
 /* Middleware to parse JSON and URL-encoded data */
-const cors = require('cors');
-const cookieParser = require('cookie-parser');
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
 
 app.use(cookieParser());
 // if (process.env.NODE_ENV !== 'PROD') {
@@ -36,9 +36,10 @@ app.use(cookieParser());
 // }
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 /* Routes */
-const userRoutes = require('./routes/user-routes');
-const entryRoutes = require('./routes/entry-routes');
+import userRoutes from './routes/user-routes';
+import entryRoutes from './routes/entry-routes';
 
 app.use("/user_api", userRoutes);
 app.use("/entry_api", entryRoutes);
