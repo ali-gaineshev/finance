@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const {HTTP_CODE} = require('../models/enums');
+const {HTTP_CODE} = require('../models/interfaces');
 
 /**
  * Middleware function to authenticate JWT token.

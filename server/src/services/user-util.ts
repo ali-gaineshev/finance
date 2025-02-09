@@ -1,5 +1,5 @@
-const User = require('../models/user');
-const {hashPassword, verifyPassword} = require('./util');
+import User from '../models/user';
+import { hashPassword, verifyPassword } from './util';
 
 /**
  * Save a new user to the database after hashing the password.
