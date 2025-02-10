@@ -1,5 +1,6 @@
-import User from '../models/user';
+import User, { IUser } from '../models/user';
 import { hashPassword, verifyPassword } from './util';
+import {VerifyUserResponse} from "../models/interfaces";
 
 /**
  * Save a new user to the database after hashing the password.
@@ -10,7 +11,7 @@ import { hashPassword, verifyPassword } from './util';
  * @param {string} password - The user's password.
  * @returns {Promise} - A promise that resolves to the saved user document.
  */
-const saveUser = async (email, name, password) => {
+const saveUser = async (email: string, name: string, password: string): Promise<any> => {
     // hash the password
     const hashedPassword = await hashPassword(password);
     //save the user
@@ -26,11 +27,11 @@ const saveUser = async (email, name, password) => {
  * @returns {Promise<Object>} - An object containing the result of the verification,
  *                              boolean that indicates if password match; user's name; user's id in Mongodb
  */
-const verifyUser = async (inputEmail, inputPassword) => {
+const verifyUser = async (inputEmail: string, inputPassword: string): Promise<VerifyUserResponse> => {
     let isMatch = false;
-    let user;
+    let user: IUser | null = null;
     try{
-        user = await getUserByEmail(inputEmail)
+        user = await getUserByEmail(inputEmail);
 
         if(user){
             isMatch = await verifyPassword(inputPassword, user.password);
@@ -39,10 +40,11 @@ const verifyUser = async (inputEmail, inputPassword) => {
     }catch(err){
         console.log("Error logging in\n" + err);
     }
+
     return {
         isMatch,
         username: user ? user.name: null,
-        _id: user ? user._id : null,
+        uuid: user ? user._id : null,
     };
 }
 
@@ -52,7 +54,7 @@ const verifyUser = async (inputEmail, inputPassword) => {
  * @param {string} email - The user's email.
  * @returns {Promise} - A promise that resolves to the user document or null if not found.
  */
-const getUserByEmail = (email) => {
+const getUserByEmail = (email: string): Promise<IUser | null> => {
     return User.findOne({email: email});
 }
 
@@ -61,11 +63,11 @@ const getUserByEmail = (email) => {
  *
  * @returns {Promise} - A promise that resolves to an array of all user documents.
  */
-const getUsers = () => {
+const getUsers = (): Promise<Array<IUser>> => {
     return User.find({});
 }
 
-module.exports = {
+export {
     verifyUser,
     saveUser,
     getUserByEmail,

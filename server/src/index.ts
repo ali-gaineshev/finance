@@ -6,7 +6,7 @@ import express, { Express, Request, Response } from "express";
 const app: Express = express();
 import Config from './config/config' ;
 /* DB */
-import { connectDB } from './services/db-connection.js';
+import { connectDB } from './services/db-connection';
 connectDB();
 /* Middleware to parse JSON and URL-encoded data */
 import cors from 'cors';

@@ -2,6 +2,7 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 
 
 export interface IEntry extends Document {
+    _id: string;
     category: string;
     type: string;
     occurrence: string;
