@@ -39,4 +39,6 @@ const authenticateToken = (req: express.Request, res: express.Response, next: ex
     }
 };
 
-module.exports = authenticateToken;
+export default {
+    authenticateToken,
+}

@@ -1,7 +1,9 @@
 import bcrypt from "bcrypt";
 import jwt, { Secret, SignOptions } from "jsonwebtoken";
 import Config from "../config/config";
-import {ValidationErrorMessage} from "@shared/interfaces/validation-error"
+import { ValidationErrorMessage } from "@shared/interfaces/validation-error";
+import { Result, ValidationError } from "express-validator";
+import { FieldValidationError } from "express-validator/lib/base";
 /**
  * Hashes the provided password using bcrypt.
  *
@@ -9,8 +11,8 @@ import {ValidationErrorMessage} from "@shared/interfaces/validation-error"
  * @returns A promise that resolves to the hashed password.
  */
 const hashPassword = (password: string): Promise<string> => {
-    const saltRounds = Config.SALT_ROUNDS; // Salt rounds determine the complexity of the hash
-    return bcrypt.hash(password, saltRounds);
+  const saltRounds = Config.SALT_ROUNDS; // Salt rounds determine the complexity of the hash
+  return bcrypt.hash(password, saltRounds);
 };
 
 /**
@@ -20,8 +22,11 @@ const hashPassword = (password: string): Promise<string> => {
  * @param hashedPassword - The hashed password stored in the database.
  * @returns A promise that resolves to a boolean indicating if the passwords match.
  */
-const verifyPassword = (inputPassword: string, hashedPassword: string): Promise<boolean> => {
-    return bcrypt.compare(inputPassword, hashedPassword);
+const verifyPassword = (
+  inputPassword: string,
+  hashedPassword: string
+): Promise<boolean> => {
+  return bcrypt.compare(inputPassword, hashedPassword);
 };
 
 /**
@@ -31,7 +36,11 @@ const verifyPassword = (inputPassword: string, hashedPassword: string): Promise<
  * @returns The signed JWT token.
  */
 const generateAccessToken = (payload: object): string => {
-    return jwt.sign(payload, Config.ACCESS_TOKEN_SECRET as Secret, { expiresIn: Config.ACCESS_TOKEN_EXPIRY } as SignOptions);
+  return jwt.sign(
+    payload,
+    Config.ACCESS_TOKEN_SECRET as Secret,
+    { expiresIn: Config.ACCESS_TOKEN_EXPIRY } as SignOptions
+  );
 };
 
 /**
@@ -41,7 +50,11 @@ const generateAccessToken = (payload: object): string => {
  * @returns The signed JWT token.
  */
 const generateRefreshToken = (payload: string | object): string => {
-    return jwt.sign(payload, Config.REFRESH_TOKEN_SECRET as Secret, { expiresIn: Config.REFRESH_TOKEN_EXPIRY } as SignOptions);
+  return jwt.sign(
+    payload,
+    Config.REFRESH_TOKEN_SECRET as Secret,
+    { expiresIn: Config.REFRESH_TOKEN_EXPIRY } as SignOptions
+  );
 };
 
 /**
@@ -50,15 +63,19 @@ const generateRefreshToken = (payload: string | object): string => {
  * @param errors - The validation errors from express-validator.
  * @returns A formatted error response object.
  */
-const generateValidationErrorResponse = (errors: any): ValidationErrorMessage => {
-    const err = errors.array()[0];
-    return { error: { message: err.msg, value: err.path } };
+const generateValidationErrorResponse = (
+  errors: Result<ValidationError>
+): ValidationErrorMessage => {
+  const err = errors
+    .array()
+    .find((e): e is FieldValidationError => "path" in e);
+  return { message: err?.msg || "Unknown error", value: err?.path || "" };
 };
 
 export {
-    generateAccessToken,
-    generateRefreshToken,
-    hashPassword,
-    verifyPassword,
-    generateValidationErrorResponse
+  generateAccessToken,
+  generateRefreshToken,
+  hashPassword,
+  verifyPassword,
+  generateValidationErrorResponse,
 };
