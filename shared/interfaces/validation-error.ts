@@ -1,6 +1,4 @@
 export interface ValidationErrorMessage {
-    error: {
-        message: string;
-        value: string
-    }
+  message: string;
+  value: string;
 }

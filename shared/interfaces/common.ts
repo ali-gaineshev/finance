@@ -1,4 +1,4 @@
-export interface LoginResponse {
+interface LoginResponse {
     token: string;
     userState: {
         name: string;
@@ -7,11 +7,22 @@ export interface LoginResponse {
     }
 }
 
-export interface RefreshResponse {
+interface RefreshResponse {
     token: string;
     // userState: {
     //     name: string;
     //     email: string;
     //     uuid: string;
     // }
+}
+
+interface EmailPassword {
+    email: string;
+    password: string;
+}
+
+export {
+    LoginResponse,
+    RefreshResponse,
+    EmailPassword
 }
