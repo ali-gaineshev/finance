@@ -1,2 +1,2 @@
 export * from "./dto/response";
-export * from "./interfaces/common";
+export * from "./types/common-response";
