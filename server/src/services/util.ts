@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt, { Secret, SignOptions } from "jsonwebtoken";
 import Config from "../config/config";
-import { ValidationErrorMessage } from "@shared/interfaces/validation-error";
+import { ValidationErrorMessage } from "@shared/types/common-error";
 import { Result, ValidationError } from "express-validator";
 import { FieldValidationError } from "express-validator/lib/base";
 /**

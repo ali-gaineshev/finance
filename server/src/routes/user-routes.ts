@@ -1,104 +1,156 @@
 /* Express */
-import express, {Request, Response} from 'express';
+import express, { Request, Response } from "express";
 const router = express.Router();
 /* Auth */
-import authenticateToken from '../middlewares/auth';
+import authenticateToken from "../middlewares/auth";
 import jwt from "jsonwebtoken";
 /* Express Validator */
-import { body, validationResult } from 'express-validator';
+import { body, validationResult } from "express-validator";
 /* Util Functions */
-import {getUserByEmail, getUsers, saveUser, verifyUser} from "../services/user-util";
-import {generateAccessToken, generateRefreshToken, generateValidationErrorResponse} from "../services/util";
-import {HTTP_CODE, JWT_TOKEN_CREDENTIALS_TYPE, LoginJWTPayload, VerifyUserResponse} from "../models/interfaces";
-import {ResponseDTO} from "@shared/dto/response";
-import {EmailPassword} from "@shared/interfaces/common";
+import {
+  getUserByEmail,
+  getUsers,
+  saveUser,
+  verifyUser,
+} from "../services/user-util";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  generateValidationErrorResponse,
+} from "../services/util";
+import {
+  HTTP_CODE,
+  JWT_TOKEN_CREDENTIALS_TYPE,
+  LoginJWTPayload,
+  VerifyUserResponse,
+} from "../models/interfaces";
+import { ResponseDTO } from "@shared/dto/response";
+import { EmailPassword } from "@shared/types/common-response";
 import Config from "../config/config";
 /* Middleware */
 //
 
-router.post("/register", [
+router.post(
+  "/register",
+  [
     // Validate input fields
-    body('email').trim().isEmail().withMessage('Email is invalid'),
-    body('name')
-        .notEmpty().withMessage('Name is required')
-        .matches(/^[A-Za-z]+$/).withMessage('Name must only contain letters'),
-    body('password').trim()
-        .isLength({min: 6}).withMessage('Password must be at least 6 characters long')
-], async (req: Request, res: Response) => {
+    body("email").trim().isEmail().withMessage("Email is invalid"),
+    body("name")
+      .notEmpty()
+      .withMessage("Name is required")
+      .matches(/^[A-Za-z]+$/)
+      .withMessage("Name must only contain letters"),
+    body("password")
+      .trim()
+      .isLength({ min: 6 })
+      .withMessage("Password must be at least 6 characters long"),
+  ],
+  async (req: Request, res: Response) => {
     // Check for validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        const err_response = generateValidationErrorResponse(errors);
-        res.status(HTTP_CODE.BAD_REQUEST).json(new ResponseDTO({success: false, message: "Error", error: err_response}).toJSON());
-        return;
+      const err_response = generateValidationErrorResponse(errors);
+      res.status(HTTP_CODE.BAD_REQUEST).json(
+        new ResponseDTO({
+          success: false,
+          message: "Error",
+          error: err_response,
+        }).toJSON()
+      );
+      return;
     }
 
     // try to register
     try {
-        const {email, name, password} = req.body;
-        await saveUser(email, name, password);
-        res.status(HTTP_CODE.OK)
-            .json(new ResponseDTO({success: true, message: 'User created successfully'}).toJSON());
+      const { email, name, password } = req.body;
+      await saveUser(email, name, password);
+      res.status(HTTP_CODE.OK).json(
+        new ResponseDTO({
+          success: true,
+          message: "User created successfully",
+        }).toJSON()
+      );
     } catch (err: any) {
-        // this error value means duplicate user
-        const duplication_message = err.errmsg?.includes("E11000");
-        res.status(HTTP_CODE.INTERNAL_SERVER_ERROR)
-            .json(new ResponseDTO({success: false, message: duplication_message}).toJSON());
+      // this error value means duplicate user
+      const duplication_message = err.errmsg?.includes("E11000");
+      res.status(HTTP_CODE.INTERNAL_SERVER_ERROR).json(
+        new ResponseDTO({
+          success: false,
+          message: duplication_message,
+        }).toJSON()
+      );
     }
     return;
-})
+  }
+);
 
-router.post("/login", [
+router.post(
+  "/login",
+  [
     // Validate input fields
-    body('email').trim().notEmpty().withMessage('Email is invalid'),
-    body('password').trim().notEmpty().withMessage("Password is empty")
-], async (req: Request, res: Response) => {
+    body("email").trim().notEmpty().withMessage("Email is invalid"),
+    body("password").trim().notEmpty().withMessage("Password is empty"),
+  ],
+  async (req: Request, res: Response) => {
     // Check for validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        const err_response = generateValidationErrorResponse(errors);
-        res.status(HTTP_CODE.BAD_REQUEST).json(new ResponseDTO({success: false, message: "Error", error: err_response}));
-        return;
+      const err_response = generateValidationErrorResponse(errors);
+      res.status(HTTP_CODE.BAD_REQUEST).json(
+        new ResponseDTO({
+          success: false,
+          message: "Error",
+          error: err_response,
+        })
+      );
+      return;
     }
 
     //try to verify login
-    const {email, password} : EmailPassword = req.body;
-    const {isMatch, username, uuid}: VerifyUserResponse = await verifyUser(email, password);
+    const { email, password }: EmailPassword = req.body;
+    const { isMatch, username, uuid }: VerifyUserResponse = await verifyUser(
+      email,
+      password
+    );
     if (!isMatch) {
-        res.status(HTTP_CODE.OK)
-            .json(new ResponseDTO({success : false ,message: 'User login failed. Please verify your email or password'}).toJSON());
-        return;
+      res.status(HTTP_CODE.OK).json(
+        new ResponseDTO({
+          success: false,
+          message: "User login failed. Please verify your email or password",
+        }).toJSON()
+      );
+      return;
     }
 
     // Create payload for JWT token
     const payload: LoginJWTPayload = {
-        uuid: uuid,
-        email: email,
-        name: username,
-        credentials_flag: JWT_TOKEN_CREDENTIALS_TYPE.LOGIN, // Set a flag to check if token was generated by user credentials or refresh token
+      uuid: uuid,
+      email: email,
+      name: username,
+      credentials_flag: JWT_TOKEN_CREDENTIALS_TYPE.LOGIN, // Set a flag to check if token was generated by user credentials or refresh token
     };
 
     const jwtAccessToken = generateAccessToken(payload);
     const jwtRefreshToken = generateRefreshToken(payload);
 
     // Set the refresh token in HTTP-only, Secure cookie
-    res.cookie('refresh_token', jwtRefreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'PROD',
-        sameSite: process.env.NODE_ENV ===  'strict', // 'PROD' ? 'none' : 'none' requires secure:\
-        maxAge: Config.REFRESH_TOKEN_EXPIRY_SECONDS,
+    res.cookie("refresh_token", jwtRefreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "PROD",
+      sameSite: process.env.NODE_ENV === "strict", // 'PROD' ? 'none' : 'none' requires secure:\
+      maxAge: Config.REFRESH_TOKEN_EXPIRY_SECONDS,
     });
 
     // Send the access token in the response body
-     res.status(HTTP_CODE.OK)
-        .json({
-            success : true,
-            message: 'User login success',
-            token: jwtAccessToken,  // Access token is sent in the body for use in subsequent requests
-            userState: { name: username, uuid: uuid }
-        });
+    res.status(HTTP_CODE.OK).json({
+      success: true,
+      message: "User login success",
+      token: jwtAccessToken, // Access token is sent in the body for use in subsequent requests
+      userState: { name: username, uuid: uuid },
+    });
     return;
-})
+  }
+);
 //
 // router.post("/logout", (req, res) => {
 //     res.clearCookie("refresh_token", {

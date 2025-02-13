@@ -1,5 +1,5 @@
-import mongoose from 'mongoose';
-import Config from "../config/config";
+import mongoose from "mongoose";
+import Config from "./config";
 /**
  * Establishes a connection to the MongoDB database.
  *
@@ -10,13 +10,11 @@ import Config from "../config/config";
  * @throws {Error} Throws an error and exits the process if the connection fails.
  */
 export const connectDB = async () => {
-    try {
-        await mongoose.connect(Config.DB_URL, {});
-        console.log('MongoDB Connected');
-    } catch (error) {
-        console.error('MongoDB connection error:', error);
-        process.exit(1);
-    }
+  try {
+    await mongoose.connect(Config.DB_URL, {});
+    console.log("MongoDB Connected");
+  } catch (error) {
+    console.error("MongoDB connection error:", error);
+    process.exit(1);
+  }
 };
-
-
