@@ -1,7 +1,10 @@
 import bcrypt from "bcrypt";
 import jwt, { Secret, SignOptions } from "jsonwebtoken";
 import Config from "../config/config";
-import { ValidationErrorMessage } from "@shared/types/common-error";
+import {
+  CommonErrorMessage,
+  ValidationErrorMessage,
+} from "@shared/types/common-error";
 import { Result, ValidationError } from "express-validator";
 import { FieldValidationError } from "express-validator/lib/base";
 /**
@@ -69,7 +72,10 @@ const generateValidationErrorResponse = (
   const err = errors
     .array()
     .find((e): e is FieldValidationError => "path" in e);
-  return { message: err?.msg || "Unknown error", value: err?.path || "" };
+  return {
+    message: err?.msg || CommonErrorMessage.UNKNOWN_ERROR,
+    value: err?.path || "",
+  };
 };
 
 export {
