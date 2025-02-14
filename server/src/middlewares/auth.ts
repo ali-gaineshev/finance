@@ -1,9 +1,9 @@
-import jwt from 'jsonwebtoken';
-import { HTTP_CODE } from '../models/interfaces';
-import {ResponseDTO} from "@shared/dto/response";
+import jwt from "jsonwebtoken";
+import { HTTP_CODE } from "../types/types";
+import { ResponseDTO } from "@shared/dto/response";
 import express from "express";
 import Config from "../config/config";
-import {LoginJWTPayload} from "../models/interfaces";
+import { LoginJWTPayload } from "../types/types";
 
 /**
  * Middleware function to authenticate JWT token.
@@ -18,27 +18,37 @@ import {LoginJWTPayload} from "../models/interfaces";
  * @param {Response} res - The response object used to send a response back to the client.
  * @param {NextFunction} next - The function to call to pass control to the next middleware or route handler.
  */
-const authenticateToken = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    // Getss token from Authorization header
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+const authenticateToken = (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) => {
+  // Getss token from Authorization header
+  const token = req.header("Authorization")?.replace("Bearer ", "");
 
-    if (!token) {
-        return res.status(HTTP_CODE.UNAUTHORIZED).json(
-            new ResponseDTO({success: false, message: 'Access denied. No token provided. Log in first'}).toJSON()
-        );
-    }
+  if (!token) {
+    return res.status(HTTP_CODE.UNAUTHORIZED).json(
+      new ResponseDTO({
+        success: false,
+        message: "Access denied. No token provided. Log in first",
+      }).toJSON()
+    );
+  }
 
-    try {
-        req.user = jwt.verify(token, Config.ACCESS_TOKEN_SECRET) as LoginJWTPayload;  // Attach user data to the request object
-        next();  // Proceed to the original func
-    } catch (err) {
-
-        return res.status(HTTP_CODE.FORBIDDEN).json(
-            new ResponseDTO({success: false, message: 'Invalid or expired token', error: err}).toJSON()
-        );
-    }
+  try {
+    req.user = jwt.verify(token, Config.ACCESS_TOKEN_SECRET) as LoginJWTPayload; // Attach user data to the request object
+    next(); // Proceed to the original func
+  } catch (err) {
+    return res.status(HTTP_CODE.FORBIDDEN).json(
+      new ResponseDTO({
+        success: false,
+        message: "Invalid or expired token",
+        error: err,
+      }).toJSON()
+    );
+  }
 };
 
 export default {
-    authenticateToken,
-}
+  authenticateToken,
+};
