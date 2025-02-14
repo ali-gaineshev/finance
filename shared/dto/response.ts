@@ -1,4 +1,4 @@
-export class ResponseDTO<T> {
+export default class ResponseDTO<T> {
 
     private readonly success: boolean;
     private readonly data?: T;
