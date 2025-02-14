@@ -6,8 +6,7 @@ import authenticateToken from "../middlewares/auth";
 /* Express Validator */
 import { query, body, validationResult } from "express-validator";
 /* Util Functions */
-import { saveEntry, deleteEntry, getEntries } from "../services/entry-util";
-import { HTTP_CODE } from "../models/interfaces";
+import { saveEntry, deleteEntry, getEntries } from "../services/entry-service";
 /* Middleware */
 // router.use(express.json());
 // router.use(express.urlencoded({ extended: true }));
