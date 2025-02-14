@@ -1,13 +1,15 @@
 // react
-import React, { useState } from "react";
-import {Link, useNavigate} from "react-router-dom";
+import React, {useState, useRef, useEffect} from "react";
+// auth
+import { useAuth } from "../../hooks/useAuth.tsx";
+import {Link, useNavigate, useLocation} from "react-router-dom";
 // helper funcitons
-import { validateForm } from "../../utils/helpers.ts";
+import {validateForm} from "../../utils/helpers.ts";
 // hooks
-import { globalApiClient } from "../../hooks/ApiClient.ts";
-import useSignIn from 'react-auth-kit/hooks/useSignIn';
+import {globalApiClient} from "../../api/ApiClient.ts";
 // enums
 import HttpStatusCode from "../../interfaces/HttpStatusCode.ts";
+import ServerUrl from "../../interfaces/ServerUrl.ts";
 // images
 import money_stack_image from "../../assets/money_stack.png";
 //styles
@@ -15,90 +17,134 @@ import styles from "./LoginPage.module.css";
 //components
 import BootstrapButton from "../../components/Button.tsx";
 import BootstrapInput from "../../components/Input.tsx";
-import { FaEnvelope, FaLock } from "../../components/Fa-Icon.tsx";
+import {FaEnvelope, FaLock} from "../../components/Fa-Icon.tsx";
 // alert
 import alert from '../../components/ui/Alert.tsx';
 import {ToastContainer} from "react-toastify";
-
+import {LoginResponse} from "../../interfaces/Response.ts";
+import {AxiosResponse} from "axios";
 
 
 const LoginPage: React.FC = () => {
     const apiClient = globalApiClient;
-    const signIn = useSignIn();
+
     const navigate = useNavigate();
+    const location = useLocation();
+    const from = location.state?.from?.pathname || '/home';
 
-    const initialFormFields = {
-        email: "",
-        password: "",
-        rememberme: false,
-    };
+    const { setAuth } = useAuth(); // set auth state if logged in
 
-    const [formInput, setFormInput] = useState(initialFormFields);
-    const [inputError, setInputError] = useState({
-        email: "",
-        password: "",
-    });
+    const userRef = useRef<HTMLInputElement>(null);
+
+    const initialErrMsg = {
+        emailErrMsg: "",
+        passwordErrMsg: "",
+    }
+
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [rememberMe, setRememberMe] = useState(false);
+    const [errMsg, setErrMsg] = useState(initialErrMsg);
+
+    function clearInputs(){
+        setEmail('');
+        setPassword('');
+    }
+
+    useEffect(() => {
+        // @ts-ignore
+        userRef.current.focus();
+    }, [])
+
+    // clear error if user types in input
+    useEffect(() => {
+        setErrMsg((prev) => ({ ...prev, emailErrMsg: "" })); // Clear only email error
+    }, [email]);
+
+    useEffect(() => {
+        setErrMsg((prev) => ({ ...prev, passwordErrMsg: "" })); // Clear only password error
+    }, [password]);
 
 
-    const inputChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = event.target;
-
-        setFormInput((prevFormState) => ({
-            ...prevFormState,
-            [name]: value,
-        }));
-
-        // Clear the error for the field being updated
-        setInputError((prevErrors) => ({
-            ...prevErrors,
-            [name]: "",
-        }));
-    };
-
-    const handleSubmit = (event: React.FormEvent) => {
+    const handleSubmit =  async (event: React.FormEvent) => {
         event.preventDefault();
-
-        const { email, password } = formInput;
-        const newErrors = validateForm(email, password);
+        //form validation
+        const newErrors: {email: string, password: string} = validateForm(email, password);
 
         if (newErrors.email || newErrors.password) {
-            setInputError(newErrors);
+            //set error
+            setErrMsg({
+               "emailErrMsg": newErrors.email,
+               "passwordErrMsg": "Invalid password.",
+            });
+            clearInputs();
             return;
         }
 
-        apiClient.post('/user_api/login', { email, password })
-            .then((res) => {
-                if (res.status === HttpStatusCode.BAD_REQUEST) {
+        // fetch data
+        try{
+            const response: AxiosResponse = await apiClient.post(ServerUrl.LOGIN_API, {email, password})
+            const status_code: number = response.status;
+            const res: LoginResponse = response.data;
 
-                    setInputError({
-                        email: res.data.message,
-                        password: "",
-                    });
-                    return;
-                }
+            // verification error
+            if(status_code === HttpStatusCode.OK && !res.success) {
 
-                if(res.status === HttpStatusCode.OK) {
-                    // valid
-                    alert(res.data.message, "success");
-                    setTimeout(() => {
-                        if (
-                            signIn({
-                                auth: {
-                                    token: res.data.token, // access token
-                                    type: 'Bearer',
-                                },
-                                userState: res.data.userState, // user information
-                            })
-                        ) {
-                            navigate('/home');
-                        }
-                    }, 1000); // Delay navigation by 1 seconds
-                }
-            }).catch((error) => {
+                alert(res.message, 'error')
+            }
 
-            console.error("Login error:", error);
-            alert(error.response.data.message, "error");
-        });
+            if(status_code === HttpStatusCode.OK && res.success) {
+                // valid login
+                const accessToken = res.token;
+
+                alert(res.message, 'success')
+
+                setTimeout(() => {
+                    setAuth({
+                        'token' : accessToken,
+                        'userState' : res.userState
+                    })
+                    // navigate(from, {replace: true});
+                    navigate(from);
+                }, 1000); // Delay navigation by 1 seconds
+
+
+            }
+        }catch (e: any) {
+            let message = e.response?.message;
+            if(e.status === HttpStatusCode.INTERNAL_SERVER_ERROR) {
+                message = "Server is down. Please try again later"
+            }
+            alert(message, 'error')
+        }finally {
+            clearInputs();
+        }
+
+
+
+        // apiClient.post('/user_api/login', { email, password })
+        //     .then((res) => {
+        //         if (res.status === HttpStatusCode.BAD_REQUEST) {
+        //
+        //             setInputError({
+        //                 email: res.data.message,
+        //                 password: "",
+        //             });
+        //             return;
+        //         }
+        //
+        //         if(res.status === HttpStatusCode.OK) {
+        //             // valid
+        //             alert(res.data.message, "success");
+        //             setTimeout(() => {
+        //                 navigate('/home');
+        //             }, 1000); // Delay navigation by 1 seconds
+        //         }
+        //     }).catch((error) => {
+        //
+        //     console.error("Login error:", error);
+        //     alert(error.response.data.message, "error");
+        // });
     };
 
     return (
@@ -120,20 +166,24 @@ const LoginPage: React.FC = () => {
                                 <BootstrapInput
                                     id="email_input_id"
                                     type="email"
-                                    name="email"
                                     className={`form-control form-control-lg ${
-                                        inputError.email ? "is-invalid" : ""
+                                        email ? "is-invalid" : ""
                                     }`}
-                                    placeholder="Enter a valid email address"
-                                    onChange={inputChangeHandler}
                                     autoComplete="on"
+                                    placeholder="Enter a valid email address"
+                                    onChange={
+                                        (e) => setEmail(e.target.value)
+                                    }
+                                    value={email}
+                                    ref={userRef}
+                                    required
                                 />
-                                <FaEnvelope />
+                                <FaEnvelope/>
                                 <label className="form-label" htmlFor="email_input_id">
                                     Email address
                                 </label>
-                                {inputError.email && (
-                                    <div className="invalid-feedback">{inputError.email}</div>
+                                {errMsg.emailErrMsg && (
+                                    <div className="invalid-feedback">{email}</div>
                                 )}
                             </div>
 
@@ -142,20 +192,23 @@ const LoginPage: React.FC = () => {
                                 <BootstrapInput
                                     id="password_input_id"
                                     type="password"
-                                    name="password"
                                     className={`form-control form-control-lg ${
-                                        inputError.password ? "is-invalid" : ""
+                                        email ? "is-invalid" : ""
                                     }`}
-                                    placeholder="Enter password"
-                                    onChange={inputChangeHandler}
-                                    autoComplete="on"
+                                    autoComplete="off"
+                                    placeholder="Enter a valid password"
+                                    onChange={
+                                        (e) => setPassword(e.target.value)
+                                    }
+                                    value={password}
+                                    required
                                 />
-                                <FaLock />
+                                <FaLock/>
                                 <label className="form-label" htmlFor="password_input_id">
                                     Password
                                 </label>
-                                {inputError.password && (
-                                    <div className="invalid-feedback">{inputError.password}</div>
+                                {errMsg.passwordErrMsg && (
+                                    <div className="invalid-feedback">{password}</div>
                                 )}
                             </div>
 
@@ -167,7 +220,7 @@ const LoginPage: React.FC = () => {
                                         type="checkbox"
                                         name="rememberme"
                                         className="form-check-input me-2"
-                                        onChange={inputChangeHandler}
+                                        onChange={() => setRememberMe(!rememberMe)}
                                     />
                                     <label
                                         className="form-check-label"
@@ -185,7 +238,7 @@ const LoginPage: React.FC = () => {
                                 <BootstrapButton
                                     variant="primary"
                                     size="lg"
-                                    style={{ paddingLeft: "2.5rem", paddingRight: "2.5rem" }}
+                                    style={{paddingLeft: "2.5rem", paddingRight: "2.5rem"}}
                                 >
                                     Login
                                 </BootstrapButton>
