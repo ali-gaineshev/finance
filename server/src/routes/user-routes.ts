@@ -1,21 +1,13 @@
 /* Express */
-import express, { Request, Response } from "express";
+import express from "express";
 const router = express.Router();
 /* Controller */
 import UserController from "../controllers/user-controllers";
 /* Middleware */
-import {
-  loginValidation,
-  registrationValidation,
-} from "../middlewares/validators/user.validator";
+import { loginValidation, registrationValidation } from "../middlewares/validators/user.validator";
 import { validateRequest } from "../middlewares/validateRequest";
 
-router.post(
-  "/register",
-  registrationValidation,
-  validateRequest,
-  UserController.register,
-);
+router.post("/register", registrationValidation, validateRequest, UserController.register);
 
 router.post("/login", loginValidation, validateRequest, UserController.login);
 
