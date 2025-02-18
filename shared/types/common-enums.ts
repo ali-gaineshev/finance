@@ -11,9 +11,14 @@ const enum HTTP_CODE {
   SERVICE_UNAVAILABLE = 503,
 }
 
+type EmailPasswordType = {
+  email: string;
+  password: string;
+};
+
 const enum JWT_TOKEN_CREDENTIALS_TYPE {
   LOGIN = "login_credentials",
   REFRESH = "refresh_credentials",
 }
 
-export { HTTP_CODE, JWT_TOKEN_CREDENTIALS_TYPE };
+export { HTTP_CODE, JWT_TOKEN_CREDENTIALS_TYPE, EmailPasswordType };

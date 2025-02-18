@@ -1,24 +1,19 @@
-interface LoginResponse {
+type LoginResponse = {
   token: string;
   userState: {
-    name: string;
-    email: string;
-    uuid: string;
+    name: string | null;
+    email: string | null;
+    uuid: string | null;
   };
-}
+};
 
-interface RefreshResponse {
+type RefreshResponse = {
   token: string;
   // userState: {
   //     name: string;
   //     email: string;
   //     uuid: string;
   // }
-}
-
-type EmailPasswordType = {
-  email: string;
-  password: string;
 };
 
-export { LoginResponse, RefreshResponse, EmailPasswordType };
+export { LoginResponse, RefreshResponse };
