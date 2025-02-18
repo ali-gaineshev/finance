@@ -6,18 +6,11 @@ import { generateAccessToken, generateRefreshToken } from "../services/util";
 // Middleware
 import jwt from "jsonwebtoken";
 // Enums and types
-import {
-  HTTP_CODE,
-  JWT_TOKEN_CREDENTIALS_TYPE,
-} from "@shared/types/common-enums";
+import { HTTP_CODE, JWT_TOKEN_CREDENTIALS_TYPE, EmailPasswordType } from "@shared/types/common-enums";
 import ResponseDTO from "@shared/dto/response";
-import { EmailPasswordType } from "@shared/types/common-response";
+import { LoginResponse, RefreshResponse } from "@shared/types/common-response";
 import { LoginJWTPayload, VerifyUserResponse } from "../types/types";
-import {
-  defaultCookieOptions,
-  defaultCookieOptionsWithMaxAge,
-  REFRESH_TOKEN_COOKIE,
-} from "../config/cookie-option";
+import { defaultCookieOptions, defaultCookieOptionsWithMaxAge, REFRESH_TOKEN_COOKIE } from "../config/cookie-option";
 import { CommonErrorMessage, CommonMessage } from "@shared/types/common-error";
 import Config from "../config/config";
 
@@ -31,7 +24,7 @@ class UserController {
         new ResponseDTO({
           success: true,
           message: "User created successfully",
-        }).toJSON(),
+        }),
       );
     } catch (err: any) {
       // this error value means duplicate user
@@ -49,10 +42,7 @@ class UserController {
   static async login(req: Request, res: Response) {
     //try to verify login
     const { email, password }: EmailPasswordType = req.body;
-    const { isMatch, username, uuid }: VerifyUserResponse = await verifyUser(
-      email,
-      password,
-    );
+    const { isMatch, username, uuid }: VerifyUserResponse = await verifyUser(email, password);
     if (!isMatch) {
       res.status(HTTP_CODE.OK).json(
         new ResponseDTO({
@@ -75,19 +65,23 @@ class UserController {
     const jwtRefreshToken = generateRefreshToken(payload);
 
     // Set the refresh token in HTTP-only, Secure cookie
-    res.cookie(
-      REFRESH_TOKEN_COOKIE,
-      jwtRefreshToken,
-      defaultCookieOptionsWithMaxAge,
-    );
+    res.cookie(REFRESH_TOKEN_COOKIE, jwtRefreshToken, defaultCookieOptionsWithMaxAge);
 
     // Send the access token in the response body
-    res.status(HTTP_CODE.OK).json({
-      success: true,
-      message: CommonMessage.LOGIN_SUCCESS,
-      token: jwtAccessToken, // Access token is sent in the body for use in subsequent requests
-      userState: { name: username, uuid: uuid },
-    });
+    res.status(HTTP_CODE.OK).json(
+      new ResponseDTO<LoginResponse>({
+        success: true,
+        message: CommonMessage.LOGIN_SUCCESS,
+        data: {
+          token: jwtAccessToken, // Access token is sent in the body for use in subsequent requests
+          userState: {
+            name: username,
+            uuid: uuid,
+            email: email,
+          },
+        },
+      }),
+    );
   }
 
   static async refresh_token(req: Request, res: Response) {
@@ -105,10 +99,7 @@ class UserController {
     }
 
     try {
-      const payload = jwt.verify(
-        refreshToken,
-        Config.REFRESH_TOKEN_SECRET,
-      ) as LoginJWTPayload;
+      const payload = jwt.verify(refreshToken, Config.REFRESH_TOKEN_SECRET) as LoginJWTPayload;
 
       const jwtAccessToken = generateAccessToken({
         uuid: payload.uuid,
@@ -120,9 +111,7 @@ class UserController {
       // Send the new access token in the response
       res
         .status(HTTP_CODE.OK)
-        .json(
-          new ResponseDTO({ success: true, data: { token: jwtAccessToken } }),
-        );
+        .json(new ResponseDTO<RefreshResponse>({ success: true, data: { token: jwtAccessToken } }));
     } catch (err: any) {
       res.status(HTTP_CODE.FORBIDDEN).json(
         new ResponseDTO({
@@ -135,7 +124,7 @@ class UserController {
 
   static async logout(req: Request, res: Response) {
     res.clearCookie(REFRESH_TOKEN_COOKIE, defaultCookieOptions);
-    console.log("LOGGED OUT");
+
     res.status(200).json(
       new ResponseDTO({
         success: true,
