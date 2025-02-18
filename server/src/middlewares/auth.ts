@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
-import { HTTP_CODE } from "../types/types";
-import { ResponseDTO } from "@shared/dto/response";
+import { HTTP_CODE } from "@shared/types/common-enums";
+import ResponseDTO from "@shared/dto/response";
 import express from "express";
 import Config from "../config/config";
 import { LoginJWTPayload } from "../types/types";
@@ -18,11 +18,7 @@ import { LoginJWTPayload } from "../types/types";
  * @param {Response} res - The response object used to send a response back to the client.
  * @param {NextFunction} next - The function to call to pass control to the next middleware or route handler.
  */
-const authenticateToken = (
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction
-) => {
+const authenticateToken = (req: express.Request, res: express.Response, next: express.NextFunction) => {
   // Getss token from Authorization header
   const token = req.header("Authorization")?.replace("Bearer ", "");
 
@@ -31,7 +27,7 @@ const authenticateToken = (
       new ResponseDTO({
         success: false,
         message: "Access denied. No token provided. Log in first",
-      }).toJSON()
+      }),
     );
   }
 
@@ -44,7 +40,7 @@ const authenticateToken = (
         success: false,
         message: "Invalid or expired token",
         error: err,
-      }).toJSON()
+      }),
     );
   }
 };
