@@ -18,33 +18,31 @@ import { LoginJWTPayload } from "../types/types";
  * @param {Response} res - The response object used to send a response back to the client.
  * @param {NextFunction} next - The function to call to pass control to the next middleware or route handler.
  */
-const authenticateToken = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+export const authenticateToken = (req: express.Request, res: express.Response, next: express.NextFunction) => {
   // Getss token from Authorization header
   const token = req.header("Authorization")?.replace("Bearer ", "");
 
   if (!token) {
-    return res.status(HTTP_CODE.UNAUTHORIZED).json(
+    res.status(HTTP_CODE.UNAUTHORIZED).json(
       new ResponseDTO({
         success: false,
         message: "Access denied. No token provided. Log in first",
       }),
     );
+    return;
   }
 
   try {
     req.user = jwt.verify(token, Config.ACCESS_TOKEN_SECRET) as LoginJWTPayload; // Attach user data to the request object
     next(); // Proceed to the original func
   } catch (err) {
-    return res.status(HTTP_CODE.FORBIDDEN).json(
+    res.status(HTTP_CODE.FORBIDDEN).json(
       new ResponseDTO({
         success: false,
         message: "Invalid or expired token",
         error: err,
       }),
     );
+    return;
   }
-};
-
-export default {
-  authenticateToken,
 };
