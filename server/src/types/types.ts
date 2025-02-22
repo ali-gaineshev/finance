@@ -7,10 +7,10 @@ type VerifyUserResponse = {
 };
 
 interface LoginJWTPayload extends JwtPayload {
-  uuid: string | null;
-  email: string | null;
-  name: string | null;
-  credentials_flag: string | null;
+  uuid: string;
+  email: string;
+  name: string;
+  credentials_flag: string;
 }
 
 export { VerifyUserResponse, LoginJWTPayload };
