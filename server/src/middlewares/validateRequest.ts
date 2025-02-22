@@ -6,11 +6,7 @@ import { generateValidationErrorResponse } from "../services/util";
 import { CommonErrorMessage } from "@shared/types/common-error";
 
 // Check for validation errors
-export const validateRequest = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): void => {
+export const validateRequest = (req: Request, res: Response, next: NextFunction): void => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const err_response = generateValidationErrorResponse(errors);
