@@ -15,7 +15,7 @@ const server = http.createServer(app);
 
 // Start Server
 server.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
 
 // Handle uncaught exceptions & rejections
