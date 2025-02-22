@@ -1,12 +1,12 @@
-import { Occurrence } from "./entry-definitions";
+import { Category, Occurrence, Type } from "./entry-definitions";
 
-type AddEntryRequestType = {
+interface AddEntryRequestType {
   title: string;
-  category: string;
-  type: string;
+  category: Category;
+  type: Type;
   occurrence: Occurrence;
-  startDate: Date;
+  startDate?: Date;
   endDate?: Date;
-};
+}
 
 export { AddEntryRequestType };
