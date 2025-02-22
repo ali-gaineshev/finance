@@ -43,7 +43,7 @@ class UserController {
     //try to verify login
     const { email, password }: EmailPasswordType = req.body;
     const { isMatch, username, uuid }: VerifyUserResponse = await verifyUser(email, password);
-    if (!isMatch) {
+    if (!isMatch || !username || !uuid) {
       res.status(HTTP_CODE.OK).json(
         new ResponseDTO({
           success: false,

@@ -16,8 +16,9 @@ class EntryController {
 
       await saveEntry({ title, category, type, occurrence, startDate, endDate } as AddEntryRequestType, user.uuid);
       res.status(HTTP_CODE.OK).json(new ResponseDTO({ success: true, message: CommonMessage.ENTRY_ADDED }));
-    } catch (err) {
-      res.status(HTTP_CODE.INTERNAL_SERVER_ERROR).json(new ResponseDTO({ success: false, error: err }));
+    } catch (err: any) {
+      console.log(req.body);
+      res.status(HTTP_CODE.INTERNAL_SERVER_ERROR).json(new ResponseDTO({ success: false, error: err.message }));
     }
   }
 
