@@ -1,29 +1,31 @@
 import Entry, { IEntry } from "../models/entry";
+import { AddEntryRequestType } from "@shared/types/common-request";
 
 /**
  * Save a new entry to the database.
  *
- * @param {string} category - The category of the entry.
- * @param {string} occurrence - The occurrence type of the entry
- * @param {string} type - The type of the entry
- * @param {Date} date - The date of the entry.
+ * @param newEntry
  * @param {string} userId - The ID of the user associated with the entry.
  * @returns {Promise} - A promise that resolves to the saved entry document.
  */
-const saveEntry = (
-  category: string,
-  occurrence: string,
-  type: string,
-  date: Date,
-  userId: string
-): Promise<IEntry> => {
+const saveEntry = (newEntry: AddEntryRequestType, userId: string): Promise<IEntry> => {
   return new Entry({
-    category: category,
-    occurrence: occurrence,
-    type: type,
-    date: date,
+    ...newEntry,
     userId: userId,
   }).save();
+};
+
+const updateEntry = async (id: string, updateData: Partial<IEntry>) => {
+  const updatedEntry = await Entry.findByIdAndUpdate(id, updateData, {
+    new: true,
+    runValidators: true,
+  });
+
+  if (!updatedEntry) {
+    throw new Error("Entry not found");
+  }
+
+  return updatedEntry;
 };
 
 /**
@@ -36,11 +38,7 @@ const saveEntry = (
  *    - entries: An array of entry documents for the given user.
  *    - totalEntries: The total number of entries for the user.
  */
-const getEntries = async (
-  userId: string,
-  page: number,
-  limit: number
-): Promise<object> => {
+const getEntries = async (userId: string, page: number, limit: number): Promise<object> => {
   const totalEntries: number = await Entry.countDocuments({ userId });
   const entries: Array<IEntry> = await Entry.find({ userId: userId })
     .sort({ date: -1 }) // Sort by date descending (newest first)
