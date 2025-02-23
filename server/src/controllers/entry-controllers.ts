@@ -6,6 +6,7 @@ import { AddEntryRequestType } from "@shared/types/common-request";
 import { Occurrence } from "@shared/types/entry-definitions";
 import ResponseDTO from "@shared/dto/response";
 import { CommonErrorMessage, CommonMessage } from "@shared/types/common-error";
+import { GetAllEntriesResponse } from "@shared/types/common-response";
 
 class EntryController {
   static async addEntry(req: Request<{}, {}, AddEntryRequestType>, res: Response) {
@@ -22,28 +23,37 @@ class EntryController {
     }
   }
 
-  static async getAllEntries(req: Request, res: Response) {
-    // console.log(req.cookies);
-    // try {
-    //   // add pagination
-    //   const limit_per_page = 15; //hard coded value
-    //   const page = parseInt(req.query.page) || 1;
-    //   // get user's id to associate it with entries
-    //   const user_id = req.user._id; // from jwt token
-    //   // fetch entries
-    //   const { entries, totalEntries } = await getEntries(user_id, page, limit_per_page);
-    //
-    //   res.status(HTTP_CODE.OK).send({
-    //     entries,
-    //     metadata: {
-    //       totalEntries,
-    //       currentPage: page,
-    //       totalPages: Math.ceil(totalEntries / limit_per_page),
-    //     },
-    //   });
-    // } catch (err) {
-    //   res.status(HTTP_CODE.INTERNAL_SERVER_ERROR).send({ error: err.message });
-    // }
+  static async getEntries(req: Request, res: Response) {
+    try {
+      // add pagination
+      const limit_per_page = 15; //hard coded value
+      const page = req.query?.page ? parseInt(req.query.page as string, 10) : 1;
+      // get user's id to associate it with entries
+      const user_id: string = req.user.uuid; // from jwt token
+      // fetch entries
+      const { entries, totalEntries } = await getEntries(user_id, page, limit_per_page);
+
+      res.status(HTTP_CODE.OK).json(
+        new ResponseDTO<GetAllEntriesResponse>({
+          success: true,
+          data: {
+            entries: entries,
+            metadata: {
+              totalEntries: totalEntries,
+              currentPage: page,
+              totalPages: Math.ceil(totalEntries / limit_per_page),
+            },
+          },
+        }),
+      );
+    } catch (err: any) {
+      res.status(HTTP_CODE.INTERNAL_SERVER_ERROR).json(
+        new ResponseDTO({
+          success: false,
+          error: err.message,
+        }),
+      );
+    }
   }
 
   static async deleteEntry(req: Request, res: Response) {

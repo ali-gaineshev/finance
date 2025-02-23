@@ -10,7 +10,7 @@ import EntryController from "../controllers/entry-controllers";
 
 router.post("/add_entry", authenticateToken, add_entry_validator, validateRequest, EntryController.addEntry);
 
-router.get("/get_all_entries", authenticateToken, EntryController.getAllEntries);
+router.get("/get_entries", authenticateToken, EntryController.getEntries);
 
 router.delete("/delete_entry", authenticateToken, delete_entry_validator, validateRequest, EntryController.deleteEntry);
 

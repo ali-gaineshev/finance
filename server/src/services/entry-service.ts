@@ -38,13 +38,30 @@ const updateEntry = async (id: string, updateData: Partial<IEntry>) => {
  *    - entries: An array of entry documents for the given user.
  *    - totalEntries: The total number of entries for the user.
  */
-const getEntries = async (userId: string, page: number, limit: number): Promise<object> => {
+const getEntries = async (
+  userId: string,
+  page: number,
+  limit: number,
+): Promise<{ entries: Array<IEntry>; totalEntries: number }> => {
   const totalEntries: number = await Entry.countDocuments({ userId });
   const entries: Array<IEntry> = await Entry.find({ userId: userId })
-    .sort({ date: -1 }) // Sort by date descending (newest first)
     .skip((page - 1) * limit) // Skip entries for previous pages
     .limit(limit); // Fixed limit for entries per page
 
+  return { entries, totalEntries };
+};
+
+/**
+ * Retrieve all entries for a specific user from the database.
+ *
+ * @param {string} userId - The ID of the user whose entries need to be fetched.
+ * @returns {Promise<Object>} - A promise that resolves to an object containing:
+ *    - entries: An array of entry documents for the given user.
+ *    - totalEntries: The total number of entries for the user.
+ */
+const getAllEntries = async (userId: string): Promise<{ entries: Array<IEntry>; totalEntries: number }> => {
+  const entries: Array<IEntry> = await Entry.find({ userId: userId });
+  const totalEntries: number = entries.length;
   return { entries, totalEntries };
 };
 
@@ -58,4 +75,4 @@ const deleteEntry = (id: string): Promise<any> => {
   return Entry.deleteOne({ _id: id }).exec();
 };
 
-export { saveEntry, deleteEntry, getEntries };
+export { saveEntry, deleteEntry, getEntries, getAllEntries };
