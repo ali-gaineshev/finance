@@ -21,6 +21,10 @@ const add_entry_validator = [
     .isString().withMessage("Type must be a string").bail()
     .isIn(Object.values(Type)).withMessage("Invalid type"),
 ];
-const delete_entry_validator = [body("entry_id").isString().notEmpty().withMessage("Invalid entry.")];
+const delete_entry_validator = [
+  body("entry_id").trim()
+    .notEmpty().withMessage("Invalid entry.").bail()
+    .isString().withMessage("Invalid entry.")
+];
 
 export { add_entry_validator, delete_entry_validator };

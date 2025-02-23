@@ -1,5 +1,6 @@
 import Entry, { IEntry } from "../models/entry";
 import { AddEntryRequestType } from "@shared/types/common-request";
+import { DeleteEntryResponse } from "@shared/types/common-response";
 
 /**
  * Save a new entry to the database.
@@ -71,7 +72,7 @@ const getAllEntries = async (userId: string): Promise<{ entries: Array<IEntry>; 
  * @param {string} id - The ID of the entry to delete.
  * @returns {Promise} - A promise that resolves to the result of the delete operation.
  */
-const deleteEntry = (id: string): Promise<any> => {
+const deleteEntry = (id: string): Promise<DeleteEntryResponse> => {
   return Entry.deleteOne({ _id: id }).exec();
 };
 

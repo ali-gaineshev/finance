@@ -2,11 +2,11 @@ import { Request, Response } from "express";
 import { deleteEntry, getEntries, saveEntry } from "../services/entry-service";
 import { HTTP_CODE } from "@shared/types/common-enums";
 import { LoginJWTPayload } from "../types/types";
-import { AddEntryRequestType } from "@shared/types/common-request";
+import { AddEntryRequestType, DeleteEntryRequestType } from "@shared/types/common-request";
 import { Occurrence } from "@shared/types/entry-definitions";
 import ResponseDTO from "@shared/dto/response";
 import { CommonErrorMessage, CommonMessage } from "@shared/types/common-error";
-import { GetAllEntriesResponse } from "@shared/types/common-response";
+import { DeleteEntryResponse, GetAllEntriesResponse } from "@shared/types/common-response";
 
 class EntryController {
   static async addEntry(req: Request<{}, {}, AddEntryRequestType>, res: Response) {
@@ -57,14 +57,22 @@ class EntryController {
   }
 
   static async deleteEntry(req: Request, res: Response) {
-    const result = await deleteEntry(req.body.entry_id);
+    const { entry_id } = req.body as DeleteEntryRequestType;
+
+    const result = await deleteEntry(entry_id);
 
     if (result.deletedCount === 0) {
-      res.status(HTTP_CODE.NOT_FOUND).send({ message: "Entry not found" });
+      res
+        .status(HTTP_CODE.OK)
+        .json(new ResponseDTO({ success: false, message: CommonErrorMessage.ENTRY_DELETION_FAILED }));
       return;
     }
 
-    res.status(HTTP_CODE.OK).send({ result: result });
+    res
+      .status(HTTP_CODE.OK)
+      .json(
+        new ResponseDTO<DeleteEntryResponse>({ success: true, message: CommonMessage.ENTRY_DELETED, data: result }),
+      );
   }
 }
 
