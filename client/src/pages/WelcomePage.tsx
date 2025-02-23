@@ -1,5 +1,13 @@
+
+
 function WelcomePage() {
-    return "WelcomePage";
+
+
+    return(
+        <div>
+            Welcome Page
+        </div>
+    )
 }
 
 export default WelcomePage;

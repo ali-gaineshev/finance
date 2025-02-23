@@ -4,6 +4,7 @@ import LoginPage from './pages/Login/LoginPage';
 import RegisterPage from './pages/Register/RegisterPage.tsx';
 import HomePage from './pages/Home/HomePage.tsx';
 import AddEntryPage from './pages/AddEntryPage';
+import PersistLogin from "./pages/PersistLogin.tsx";
 
 import { RequireAuth, RequireNonAuth } from './pages/RequireAuth.tsx';
 
@@ -29,23 +30,24 @@ function App() {
                 />
 
                 {/* Protected Routes */}
-                <Route
-                    path="/home"
-                    element={
-                        <RequireAuth fallbackPath="/login">
-                            <HomePage />
-                        </RequireAuth>
-                    }
-                />
-                <Route
-                    path="/add_entry"
-                    element={
-                        <RequireAuth fallbackPath="/login">
-                            <AddEntryPage />
-                        </RequireAuth>
-                    }
-                />
-
+                <Route element={<PersistLogin />}>
+                    <Route
+                        path="/home"
+                        element={
+                            <RequireAuth fallbackPath="/login">
+                                <HomePage />
+                            </RequireAuth>
+                        }
+                    />
+                    <Route
+                        path="/add_entry"
+                        element={
+                            <RequireAuth fallbackPath="/login">
+                                <AddEntryPage />
+                            </RequireAuth>
+                        }
+                    />
+                </Route>
                 {/*Unknown*/}
                 <Route path='*' element = {<WelcomePage />}/>
 
