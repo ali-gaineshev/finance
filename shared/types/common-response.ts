@@ -23,11 +23,16 @@ type GetAllEntriesResponse = {
     currentPage: number;
     totalPages: number;
   };
-  // userState: {
-  //     name: string;
-  //     email: string;
-  //     uuid: string;
-  // }
 };
 
-export { LoginResponse, RefreshResponse, GetAllEntriesResponse };
+type DeleteEntryResponse = {
+  acknowledged: boolean;
+  deletedCount: number;
+};
+
+export {
+  LoginResponse,
+  RefreshResponse,
+  GetAllEntriesResponse,
+  DeleteEntryResponse,
+};

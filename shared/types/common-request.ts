@@ -9,4 +9,8 @@ interface AddEntryRequestType {
   endDate?: Date;
 }
 
-export { AddEntryRequestType };
+type DeleteEntryRequestType = {
+  entry_id: string;
+};
+
+export { AddEntryRequestType, DeleteEntryRequestType };
