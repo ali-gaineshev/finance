@@ -30,4 +30,4 @@ type GetAllEntriesResponse = {
   // }
 };
 
-export { LoginResponse, RefreshResponse };
+export { LoginResponse, RefreshResponse, GetAllEntriesResponse };
