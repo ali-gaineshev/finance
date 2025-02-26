@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import userRoutes from "./routes/user-routes";
 import entryRoutes from "./routes/entry-routes";
 import Config from "./config/config";
+import BACKEND_ENDPOINT from "@shared/types/endpoints";
 
 // import { errorHandler } from "./middlewares/errorHandler";
 
@@ -26,8 +27,8 @@ app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 app.use(cookieParser()); // Parse cookies
 
 // Routes
-app.use("/user_api", userRoutes);
-app.use("/entry_api", entryRoutes);
+app.use(BACKEND_ENDPOINT.USER_API, userRoutes);
+app.use(BACKEND_ENDPOINT.ENTRY_API, entryRoutes);
 
 // Error Handling Middleware
 //app.use(errorHandler);
