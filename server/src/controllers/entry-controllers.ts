@@ -5,7 +5,7 @@ import { LoginJWTPayload } from "../types/types";
 import { AddEntryRequestType, DeleteEntryRequestType } from "@shared/types/common-request";
 import { Occurrence } from "@shared/types/entry-definitions";
 import ResponseDTO from "@shared/dto/response";
-import { CommonErrorMessage, CommonMessage } from "@shared/types/common-error";
+import { CommonErrorMessage, CommonMessage, EMPTY_MESSAGE } from "@shared/types/common-message";
 import { DeleteEntryResponse, GetAllEntriesResponse } from "@shared/types/common-response";
 
 class EntryController {
@@ -19,7 +19,9 @@ class EntryController {
       res.status(HTTP_CODE.OK).json(new ResponseDTO({ success: true, message: CommonMessage.ENTRY_ADDED }));
     } catch (err: any) {
       console.log(req.body);
-      res.status(HTTP_CODE.INTERNAL_SERVER_ERROR).json(new ResponseDTO({ success: false, error: err.message }));
+      res
+        .status(HTTP_CODE.INTERNAL_SERVER_ERROR)
+        .json(new ResponseDTO({ success: false, message: CommonErrorMessage.UNKNOWN_ERROR, error: err.message }));
     }
   }
 
@@ -36,6 +38,7 @@ class EntryController {
       res.status(HTTP_CODE.OK).json(
         new ResponseDTO<GetAllEntriesResponse>({
           success: true,
+          message: EMPTY_MESSAGE,
           data: {
             entries: entries,
             metadata: {
@@ -50,6 +53,7 @@ class EntryController {
       res.status(HTTP_CODE.INTERNAL_SERVER_ERROR).json(
         new ResponseDTO({
           success: false,
+          message: CommonErrorMessage.UNKNOWN_ERROR,
           error: err.message,
         }),
       );

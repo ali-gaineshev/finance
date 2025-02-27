@@ -1,10 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt, { Secret, SignOptions } from "jsonwebtoken";
 import Config from "../config/config";
-import {
-  CommonErrorMessage,
-  ValidationErrorMessage,
-} from "@shared/types/common-error";
+import { CommonErrorMessage, ValidationErrorMessage } from "@shared/types/common-message";
 import { Result, ValidationError } from "express-validator";
 import { FieldValidationError } from "express-validator/lib/base";
 /**
@@ -25,10 +22,7 @@ const hashPassword = (password: string): Promise<string> => {
  * @param hashedPassword - The hashed password stored in the database.
  * @returns A promise that resolves to a boolean indicating if the passwords match.
  */
-const verifyPassword = (
-  inputPassword: string,
-  hashedPassword: string
-): Promise<boolean> => {
+const verifyPassword = (inputPassword: string, hashedPassword: string): Promise<boolean> => {
   return bcrypt.compare(inputPassword, hashedPassword);
 };
 
@@ -42,7 +36,7 @@ const generateAccessToken = (payload: object): string => {
   return jwt.sign(
     payload,
     Config.ACCESS_TOKEN_SECRET as Secret,
-    { expiresIn: Config.ACCESS_TOKEN_EXPIRY } as SignOptions
+    { expiresIn: Config.ACCESS_TOKEN_EXPIRY } as SignOptions,
   );
 };
 
@@ -56,7 +50,7 @@ const generateRefreshToken = (payload: string | object): string => {
   return jwt.sign(
     payload,
     Config.REFRESH_TOKEN_SECRET as Secret,
-    { expiresIn: Config.REFRESH_TOKEN_EXPIRY } as SignOptions
+    { expiresIn: Config.REFRESH_TOKEN_EXPIRY } as SignOptions,
   );
 };
 
@@ -66,22 +60,12 @@ const generateRefreshToken = (payload: string | object): string => {
  * @param errors - The validation errors from express-validator.
  * @returns A formatted error response object.
  */
-const generateValidationErrorResponse = (
-  errors: Result<ValidationError>
-): ValidationErrorMessage => {
-  const err = errors
-    .array()
-    .find((e): e is FieldValidationError => "path" in e);
+const generateValidationErrorResponse = (errors: Result<ValidationError>): ValidationErrorMessage => {
+  const err = errors.array().find((e): e is FieldValidationError => "path" in e);
   return {
     message: err?.msg || CommonErrorMessage.UNKNOWN_ERROR,
     value: err?.path || "",
   };
 };
 
-export {
-  generateAccessToken,
-  generateRefreshToken,
-  hashPassword,
-  verifyPassword,
-  generateValidationErrorResponse,
-};
+export { generateAccessToken, generateRefreshToken, hashPassword, verifyPassword, generateValidationErrorResponse };

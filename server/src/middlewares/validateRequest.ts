@@ -3,7 +3,7 @@ import { validationResult } from "express-validator";
 import ResponseDTO from "@shared/dto/response";
 import { HTTP_CODE } from "@shared/types/common-enums";
 import { generateValidationErrorResponse } from "../services/util";
-import { CommonErrorMessage } from "@shared/types/common-error";
+import { CommonErrorMessage } from "@shared/types/common-message";
 
 // Check for validation errors
 export const validateRequest = (req: Request, res: Response, next: NextFunction): void => {

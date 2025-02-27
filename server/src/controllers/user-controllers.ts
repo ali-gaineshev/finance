@@ -11,7 +11,7 @@ import ResponseDTO from "@shared/dto/response";
 import { LoginResponse, RefreshResponse } from "@shared/types/common-response";
 import { LoginJWTPayload, VerifyUserResponse } from "../types/types";
 import { defaultCookieOptions, defaultCookieOptionsWithMaxAge, REFRESH_TOKEN_COOKIE } from "../config/cookie-option";
-import { CommonErrorMessage, CommonMessage } from "@shared/types/common-error";
+import { CommonErrorMessage, CommonMessage, EMPTY_MESSAGE } from "@shared/types/common-message";
 import Config from "../config/config";
 
 class UserController {
@@ -23,7 +23,7 @@ class UserController {
       res.status(HTTP_CODE.OK).json(
         new ResponseDTO({
           success: true,
-          message: "User created successfully",
+          message: CommonMessage.REGISTER_SUCCESS,
         }),
       );
     } catch (err: any) {
@@ -32,7 +32,7 @@ class UserController {
       res.status(HTTP_CODE.OK).json(
         new ResponseDTO({
           success: false,
-          message: CommonErrorMessage.USER_ALREADY_EXISTS,
+          message: duplication_message ? CommonErrorMessage.USER_ALREADY_EXISTS : CommonErrorMessage.UNKNOWN_ERROR,
         }),
       );
     }
@@ -111,7 +111,9 @@ class UserController {
       // Send the new access token in the response
       res
         .status(HTTP_CODE.OK)
-        .json(new ResponseDTO<RefreshResponse>({ success: true, data: { token: jwtAccessToken } }));
+        .json(
+          new ResponseDTO<RefreshResponse>({ success: true, message: EMPTY_MESSAGE, data: { token: jwtAccessToken } }),
+        );
     } catch (err: any) {
       res.status(HTTP_CODE.FORBIDDEN).json(
         new ResponseDTO({
