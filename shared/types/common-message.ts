@@ -13,6 +13,7 @@ export const enum CommonMessage {
   ENTRY_DELETED = "Deleted",
 }
 export const enum CommonErrorMessage {
+  NETWORK_ERROR = "Network Error",
   TRY_AGAIN_LATER = "Try again later!",
   USER_ALREADY_EXISTS = "User with this email already exists",
   VALIDATION_ERROR = "Validation Error",
