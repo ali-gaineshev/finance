@@ -6,12 +6,20 @@
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
-    "types": ["node"],
     "allowJs": true,
+    "rootDirs": [
+      "src",
+      "../shared"
+    ] /* Specify the root folder within your source files. */,
+    "baseUrl": "." /* Specify the base directory to resolve non-relative module names. */,
+    "paths": {
+      "@shared/*": ["../shared/*"]
+    } /* Specify a set of entries that re-map imports to additional lookup locations. */,
+
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
-    "isolatedModules": true,
+    "isolatedModules": false,
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
@@ -23,5 +31,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src"]
+  "include": ["src", "../shared/**/*", "node_modules/@types"]
 }
