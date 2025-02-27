@@ -3,7 +3,10 @@ export interface ValidationErrorMessage {
   value: string;
 }
 
+export const EMPTY_MESSAGE = "";
+
 export const enum CommonMessage {
+  REGISTER_SUCCESS = "User created successfully",
   LOGOUT_SUCCESS = "Logged out successfully",
   LOGIN_SUCCESS = "Logged in successfully",
   ENTRY_ADDED = "New Entry was added successfully",

@@ -1,8 +1,8 @@
 export default class ResponseDTO<T> {
-  private readonly success: boolean;
-  private readonly data?: T;
-  private readonly message?: string;
-  private readonly error?: any;
+  readonly success: boolean;
+  readonly message: string;
+  readonly data?: T;
+  readonly error?: any;
 
   constructor({
     success,
@@ -11,8 +11,8 @@ export default class ResponseDTO<T> {
     error,
   }: {
     success: boolean;
+    message: string;
     data?: T;
-    message?: string;
     error?: any;
   }) {
     this.success = success;
