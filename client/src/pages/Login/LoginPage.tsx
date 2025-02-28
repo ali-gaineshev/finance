@@ -81,20 +81,18 @@ const LoginPage: React.FC = () => {
       const status_code: number = response.status;
       const res = response.data as ResponseDTO<LoginResponse>;
 
-      console.log(res);
+      const data = res.data as LoginResponse;
       // verification error
       if (
         status_code !== HTTP_CODE.OK ||
         !res.success ||
         !res.data ||
-        !isLoginResponse(res.data)
+        !isLoginResponse(data) // guarantees that data is LoginResponse
       ) {
         alert(res.message, "error");
       }
       if (status_code === HTTP_CODE.OK && res.success) {
         // valid login
-        const data = res.data as LoginResponse;
-
         alert(res.message, "success");
 
         setTimeout(() => {

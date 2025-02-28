@@ -1,24 +1,24 @@
-import { apiClient } from "../api/ApiClient.ts";
+import { authApiClient } from "../api/ApiClient.ts";
 import { useEffect } from "react";
 import useRefreshToken from "./useRefreshToken.tsx";
 import { useAuth } from "./useAuth.tsx";
-import { HttpStatusCode } from "axios";
 import type { InternalAxiosRequestConfig } from "axios";
-import { AuthContextType } from "../types/AuthContextType.ts";
+import { HTTP_CODE } from "@shared/types/common-enums.ts";
 
 // Extend InternalAxiosRequestConfig to include _retry
 interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
 }
 
-const usePrivateApiClient = () => {
+const useApiClient = () => {
   const refresh = useRefreshToken();
-  const { auth } = useAuth() as AuthContextType;
+  const { auth } = useAuth();
 
   useEffect(() => {
-    const requestIntercept = apiClient.interceptors.request.use(
+    const requestIntercept = authApiClient.interceptors.request.use(
       (config) => {
         // first attempt
+        console.log("Attempting too send request. Is token null? ", auth);
         if (!config.headers.get("Authorization")) {
           config.headers.set("Authorization", `Bearer ${auth?.token}`);
         }
@@ -26,24 +26,24 @@ const usePrivateApiClient = () => {
         return config;
       },
       (error) => {
+        console.log("Caught error");
         Promise.reject(error);
       },
     );
 
-    const responseIntercept = apiClient.interceptors.response.use(
+    const responseIntercept = authApiClient.interceptors.response.use(
       (response) => response,
       async (err): Promise<any> => {
         const prevRequest: CustomAxiosRequestConfig = err?.config;
-        //@ts-ignore
+
         if (
-          err?.response?.status === HttpStatusCode.Forbidden &&
+          err?.response?.status === HTTP_CODE.FORBIDDEN &&
           !prevRequest?._retry
         ) {
-          //@ts-ignore
           prevRequest._retry = true;
           const newAccessToken = await refresh();
           prevRequest.headers.set("Authorization", `Bearer ${newAccessToken}`);
-          return apiClient(prevRequest);
+          return;
         }
 
         return Promise.reject(err);
@@ -52,12 +52,12 @@ const usePrivateApiClient = () => {
 
     return () => {
       // clean up interceptor
-      apiClient.interceptors.request.eject(requestIntercept);
-      apiClient.interceptors.response.eject(responseIntercept);
+      authApiClient.interceptors.request.eject(requestIntercept);
+      authApiClient.interceptors.response.eject(responseIntercept);
     };
   }, [auth, refresh]);
 
-  return apiClient;
+  return authApiClient;
 };
 
-export default usePrivateApiClient;
+export default useApiClient;
