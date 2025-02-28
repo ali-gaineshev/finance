@@ -87,7 +87,8 @@ class UserController {
   static async refresh_token(req: Request, res: Response) {
     // Check if refresh token exists
     const refreshToken: string | undefined = req.cookies?.refresh_token;
-
+    console.log(req.cookies);
+    console.log(refreshToken);
     if (!refreshToken) {
       res.status(HTTP_CODE.UNAUTHORIZED).json(
         new ResponseDTO({

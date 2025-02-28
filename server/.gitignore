@@ -1,13 +1,8 @@
-# temp
-client-jsx
-server/.idea
-server/.vscode
-.idea
-client/.idea
-client/.vscode
-node_modules
-server/node_modules
-client/node_modules
+# ssl cert
+
+localhost.crt
+localhost.key
+
 
 # Logs
 logs
