@@ -1,9 +1,9 @@
 type LoginResponse = {
   token: string;
   userState: {
-    name: string | null;
-    email: string | null;
-    uuid: string | null;
+    name: string;
+    email: string;
+    uuid: string;
   };
 };
 

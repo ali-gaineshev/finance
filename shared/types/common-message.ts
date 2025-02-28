@@ -6,6 +6,7 @@ export interface ValidationErrorMessage {
 export const EMPTY_MESSAGE = "";
 
 export const enum CommonMessage {
+  SUCCESS = "success",
   REGISTER_SUCCESS = "User created successfully",
   LOGOUT_SUCCESS = "Logged out successfully",
   LOGIN_SUCCESS = "Logged in successfully",
@@ -13,6 +14,7 @@ export const enum CommonMessage {
   ENTRY_DELETED = "Deleted",
 }
 export const enum CommonErrorMessage {
+  ERROR = "error",
   NETWORK_ERROR = "Network Error",
   TRY_AGAIN_LATER = "Try again later!",
   USER_ALREADY_EXISTS = "User with this email already exists",

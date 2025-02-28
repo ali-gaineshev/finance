@@ -1,4 +1,4 @@
-import { LoginResponse } from "../types/common-response";
+import { LoginResponse, RefreshResponse } from "../types/common-response";
 
 function isLoginResponse(data: any): data is LoginResponse {
   return (
@@ -6,4 +6,8 @@ function isLoginResponse(data: any): data is LoginResponse {
   );
 }
 
-export { isLoginResponse };
+function isRefreshResponse(data: any): data is RefreshResponse {
+  return data && typeof data === "object" && "token" in data;
+}
+
+export { isLoginResponse, isRefreshResponse };
