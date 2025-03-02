@@ -1,7 +1,5 @@
-// auth
-import { useAuth } from "./useAuth.tsx";
 // api client
-import { authApiClient } from "../api/ApiClient.ts";
+import { apiClient } from "../api/ApiClient.ts";
 // type checker
 import { isRefreshResponse } from "@shared/type-guard/user.checker.ts";
 // enums
@@ -12,10 +10,8 @@ import { HTTP_CODE } from "@shared/types/common-enums.ts";
 import { CommonErrorMessage } from "@shared/types/common-message.ts";
 
 const useRefreshToken = () => {
-  const { setAuth } = useAuth();
-
   return async () => {
-    const response = await authApiClient.post(
+    const response = await apiClient.post(
       BACKEND_ENDPOINT.REFRESH_TOKEN_FULL_PATH,
     );
     const res = response.data as ResponseDTO<RefreshResponse>;
@@ -29,16 +25,7 @@ const useRefreshToken = () => {
       throw new Error(CommonErrorMessage.ERROR);
     }
 
-    // set new token
-    setAuth((prev) => {
-      console.log(prev);
-      return {
-        ...prev,
-        token: data.token,
-      };
-    });
-
-    return data.token;
+    return { token: data.token, userState: data.userState } as RefreshResponse;
   };
 };
 

@@ -1,8 +1,11 @@
-import { authApiClient } from "../api/ApiClient.ts";
+// api
+import { apiClient } from "../api/ApiClient.ts";
+import type { InternalAxiosRequestConfig } from "axios";
+// hooks
 import { useEffect } from "react";
 import useRefreshToken from "./useRefreshToken.tsx";
 import { useAuth } from "./useAuth.tsx";
-import type { InternalAxiosRequestConfig } from "axios";
+// enums
 import { HTTP_CODE } from "@shared/types/common-enums.ts";
 
 // Extend InternalAxiosRequestConfig to include _retry
@@ -12,15 +15,16 @@ interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
 
 const useApiClient = () => {
   const refresh = useRefreshToken();
-  const { auth } = useAuth();
+  const { auth, setAuth } = useAuth();
 
   useEffect(() => {
-    const requestIntercept = authApiClient.interceptors.request.use(
+    const requestIntercept = apiClient.interceptors.request.use(
       (config) => {
         // first attempt
         console.log("Attempting too send request. Is token null? ", auth);
-        if (!config.headers.get("Authorization")) {
-          config.headers.set("Authorization", `Bearer ${auth?.token}`);
+        if (!config.headers.get("Authorization") && auth && auth.token) {
+          console.log("Set Auth Headers");
+          config.headers.set("Authorization", `Bearer ${auth.token}`);
         }
 
         return config;
@@ -31,19 +35,34 @@ const useApiClient = () => {
       },
     );
 
-    const responseIntercept = authApiClient.interceptors.response.use(
+    const responseIntercept = apiClient.interceptors.response.use(
       (response) => response,
       async (err): Promise<any> => {
         const prevRequest: CustomAxiosRequestConfig = err?.config;
 
         if (
-          err?.response?.status === HTTP_CODE.FORBIDDEN &&
+          err?.response?.status === HTTP_CODE.UNAUTHORIZED &&
           !prevRequest?._retry
         ) {
-          prevRequest._retry = true;
-          const newAccessToken = await refresh();
-          prevRequest.headers.set("Authorization", `Bearer ${newAccessToken}`);
-          return;
+          prevRequest._retry = true; // Mark request as retried
+
+          try {
+            const { token: newAccessToken, userState: userState } =
+              await refresh();
+            setAuth((prev) => {
+              return {
+                ...prev,
+                userState: userState,
+                token: newAccessToken,
+              };
+            });
+            prevRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+
+            // Retry the request with the new token
+            return apiClient(prevRequest);
+          } catch (refreshError) {
+            return Promise.reject(refreshError);
+          }
         }
 
         return Promise.reject(err);
@@ -52,12 +71,12 @@ const useApiClient = () => {
 
     return () => {
       // clean up interceptor
-      authApiClient.interceptors.request.eject(requestIntercept);
-      authApiClient.interceptors.response.eject(responseIntercept);
+      apiClient.interceptors.request.eject(requestIntercept);
+      apiClient.interceptors.response.eject(responseIntercept);
     };
   }, [auth, refresh]);
 
-  return authApiClient;
+  return apiClient;
 };
 
 export default useApiClient;
