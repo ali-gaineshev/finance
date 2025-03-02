@@ -10,7 +10,6 @@ import { apiClient } from "../../api/ApiClient.ts";
 // enums, definitions, and types
 import { LoginResponse } from "@shared/types/common-response.ts";
 import { AxiosResponse } from "axios";
-import BACKEND from "../../api/BACKEND.ts";
 import ResponseDTO from "@shared/dto/response.ts";
 import { EmailPasswordType, HTTP_CODE } from "@shared/types/common-enums.ts";
 // images
@@ -27,6 +26,7 @@ import { ToastContainer } from "react-toastify";
 // helpers
 import { isLoginResponse } from "@shared/type-guard/user.checker.ts";
 import { CommonErrorMessage } from "@shared/types/common-message.ts";
+import BACKEND_ENDPOINT from "@shared/types/endpoints.ts";
 
 const LoginPage: React.FC = () => {
   // navigation
@@ -74,10 +74,13 @@ const LoginPage: React.FC = () => {
 
     // fetch data
     try {
-      const response: AxiosResponse = await apiClient.post(BACKEND.LOGIN, {
-        email,
-        password,
-      } as EmailPasswordType);
+      const response: AxiosResponse = await apiClient.post(
+        BACKEND_ENDPOINT.LOGOUT_FULL_PATH,
+        {
+          email,
+          password,
+        } as EmailPasswordType,
+      );
       const status_code: number = response.status;
       const res = response.data as ResponseDTO<LoginResponse>;
 
