@@ -1,11 +1,11 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import WelcomePage from "./pages/WelcomePage";
+import WelcomePage from "./pages/Welcome/WelcomePage.tsx";
 import LoginPage from "./pages/Login/LoginPage";
 import RegisterPage from "./pages/Register/RegisterPage.tsx";
 import HomePage from "./pages/Home/HomePage.tsx";
-import AddEntryPage from "./pages/AddEntryPage";
+import AddEntryPage from "./pages/AddEntry/AddEntryPage.tsx";
 
-// import { RequireAuth, RequireNonAuth } from "./pages/RequireAuth.tsx";
+import { RequireAuth, RequireNonAuth } from "./pages/RequireAuth.tsx";
 
 function App() {
   return (
@@ -16,17 +16,17 @@ function App() {
         <Route
           path="/register"
           element={
-            // <RequireNonAuth fallbackPath={"/"}>
-            <RegisterPage />
-            // </RequireNonAuth>
+            <RequireNonAuth fallbackPath={"/"}>
+              <RegisterPage />
+            </RequireNonAuth>
           }
         />
         <Route
           path="/login"
           element={
-            // <RequireNonAuth fallbackPath={"/"}>
-            <LoginPage />
-            // </RequireNonAuth>
+            <RequireNonAuth fallbackPath={"/"}>
+              <LoginPage />
+            </RequireNonAuth>
           }
         />
 
@@ -35,17 +35,17 @@ function App() {
         <Route
           path="/home"
           element={
-            // <RequireAuth fallbackPath="/login">
-            <HomePage />
-            // </RequireAuth>
+            <RequireAuth fallbackPath="/login">
+              <HomePage />
+            </RequireAuth>
           }
         />
         <Route
           path="/add_entry"
           element={
-            // <RequireAuth fallbackPath="/login">
-            <AddEntryPage />
-            // </RequireAuth>
+            <RequireAuth fallbackPath="/login">
+              <AddEntryPage />
+            </RequireAuth>
           }
         />
 
