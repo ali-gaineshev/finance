@@ -9,11 +9,11 @@ type LoginResponse = {
 
 type RefreshResponse = {
   token: string;
-  // userState: {
-  //     name: string;
-  //     email: string;
-  //     uuid: string;
-  // }
+  userState: {
+    name: string;
+    email: string;
+    uuid: string;
+  };
 };
 
 type GetAllEntriesResponse = {
