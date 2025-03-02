@@ -87,8 +87,6 @@ class UserController {
   static async refresh_token(req: Request, res: Response) {
     // Check if refresh token exists
     const refreshToken: string | undefined = req.cookies?.refresh_token;
-    console.log(req.cookies);
-    console.log(refreshToken);
     if (!refreshToken) {
       res.status(HTTP_CODE.UNAUTHORIZED).json(
         new ResponseDTO({
@@ -110,11 +108,20 @@ class UserController {
       });
 
       // Send the new access token in the response
-      res
-        .status(HTTP_CODE.OK)
-        .json(
-          new ResponseDTO<RefreshResponse>({ success: true, message: EMPTY_MESSAGE, data: { token: jwtAccessToken } }),
-        );
+      res.status(HTTP_CODE.OK).json(
+        new ResponseDTO<RefreshResponse>({
+          success: true,
+          message: EMPTY_MESSAGE,
+          data: {
+            token: jwtAccessToken,
+            userState: {
+              name: payload.name,
+              uuid: payload.uuid,
+              email: payload.email,
+            },
+          },
+        }),
+      );
     } catch (err: any) {
       res.status(HTTP_CODE.FORBIDDEN).json(
         new ResponseDTO({

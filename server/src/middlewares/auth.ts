@@ -36,7 +36,7 @@ export const authenticateToken = (req: express.Request, res: express.Response, n
     req.user = jwt.verify(token, Config.ACCESS_TOKEN_SECRET) as LoginJWTPayload; // Attach user data to the request object
     next(); // Proceed to the original func
   } catch (err) {
-    res.status(HTTP_CODE.FORBIDDEN).json(
+    res.status(HTTP_CODE.UNAUTHORIZED).json(
       new ResponseDTO({
         success: false,
         message: "Invalid or expired token",
