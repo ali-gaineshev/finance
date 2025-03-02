@@ -1,16 +1,10 @@
 import axios, { AxiosInstance } from "axios";
 
 import { createApiClientConfig } from "../utils/helpers.ts";
-import BACKEND from "./BACKEND.ts";
-
-const simpleApiConfig = createApiClientConfig({
-  url: BACKEND.URL,
-  sendCookies: true,
-});
-export const apiClient: AxiosInstance = axios.create(simpleApiConfig);
+import { BACKEND_URL } from "./BackendDefinitions.ts";
 
 const authApiConfig = createApiClientConfig({
-  url: BACKEND.URL,
+  url: BACKEND_URL,
   sendCookies: true,
 });
-export const authApiClient: AxiosInstance = axios.create(authApiConfig);
+export const apiClient: AxiosInstance = axios.create(authApiConfig);
